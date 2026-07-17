@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Search
@@ -21,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -109,7 +112,19 @@ fun TaskListView() {
                     )
                 }
             }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { },
+                containerColor = Color(0xFF0096FF),
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.Add,
+                    contentDescription = "Add New Task",
+                    modifier = Modifier.size(30.dp))
+            }
         }
+
     ) { innerPadding ->
 
         LazyColumn(
@@ -199,24 +214,26 @@ fun TaskListView() {
 
                         Column(horizontalAlignment = Alignment.Start
                         ) {
-                            Row(modifier = Modifier.fillMaxWidth(),
+
+                            // 🌅 Sunrise Row
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.Top
+                                verticalAlignment = Alignment.CenterVertically // 🎯 Centers items vertically
                             ) {
                                 Text(
                                     text = "Sunrise",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(end = 10.dp)
+                                    modifier = Modifier.width(75.dp) // 📐 Enforces a uniform column width
                                 )
 
                                 Icon(
                                     painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
                                     contentDescription = "Sunrise Icon",
                                     tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
-
+                                    modifier = Modifier.size(24.dp) // 🌟 Matching icon size
                                 )
 
                                 Text(
@@ -224,28 +241,30 @@ fun TaskListView() {
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(start = 10.dp)
+                                    modifier = Modifier.padding(start = 12.dp)
                                 )
-
                             }
 
-                            Row(modifier = Modifier.fillMaxWidth(),
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.Top
+                                verticalAlignment = Alignment.CenterVertically // 🎯 Centers items vertically
                             ) {
                                 Text(
                                     text = "Sunset",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(end = 12.dp)
+                                    modifier = Modifier.width(75.dp) // 📐 Matches the sunrise width perfectly!
                                 )
 
                                 Icon(
                                     painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
                                     contentDescription = "Sunset Icon",
                                     tint = Color.White,
-                                    modifier = Modifier.size(23.dp)
+                                    modifier = Modifier.size(24.dp) // 🌟 Matching icon size
                                 )
 
                                 Text(
@@ -253,7 +272,7 @@ fun TaskListView() {
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(start = 10.dp)
+                                    modifier = Modifier.padding(start = 12.dp)
                                 )
                             }
                         }
