@@ -2,18 +2,28 @@ package com.example.taskmaster.domain.models
 
 import com.example.taskmaster.data.local.entities.TaskEntity
 
-class Task(
+data class Task(
+    val id: Int? = null,
     val title: String,
     val description: String,
-    val isCompleted: Boolean,
-    val id: Int? = null) {
+    val isCompleted: Boolean
+)
 
-    fun Task.toEntity(): TaskEntity{
-        return TaskEntity(
-            title = this.title,
-            description = this.description,
-            isCompleted = this.isCompleted,
-            id = this.id
-        )
-    }
+// Extension functions to convert between the two layers easily
+fun Task.toEntity(): TaskEntity {
+    return TaskEntity(
+        id = this.id,
+        title = this.title,
+        description = this.description,
+        isCompleted = this.isCompleted
+    )
+}
+
+fun TaskEntity.toDomain(): Task {
+    return Task(
+        id = this.id,
+        title = this.title,
+        description = this.description ?: "",
+        isCompleted = this.isCompleted
+    )
 }

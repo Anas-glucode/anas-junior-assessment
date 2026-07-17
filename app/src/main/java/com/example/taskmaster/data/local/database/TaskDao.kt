@@ -5,21 +5,21 @@ import androidx.room3.Delete
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
-import com.example.taskmaster.domain.models.Task
+import com.example.taskmaster.data.local.entities.TaskEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface TaskDao{
+interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: Task)
+    suspend fun insertTask(task: TaskEntity) // Uses TaskEntity
 
     @Delete
-    suspend fun deleteTask(task: Task)
+    suspend fun deleteTask(task: TaskEntity) // Uses TaskEntity
 
-    @Query("SELECT * FROM task WHERE id = :id")
-     fun getTaskById(id: Int): Task
+    @Query("SELECT * FROM TaskEntity WHERE id = :id")
+    suspend fun getTaskById(id: Int): TaskEntity? // Added suspend and changed return type
 
-    @Query("SELECT * FROM task")
-    fun getTask(): Flow<List<Task>>
+    @Query("SELECT * FROM TaskEntity")
+    fun getTask(): Flow<List<TaskEntity>> // Returns Entity flow
 }
