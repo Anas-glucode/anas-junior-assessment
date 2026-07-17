@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFrom
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,10 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmaster.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -182,36 +186,77 @@ fun TaskListView() {
                                 modifier = Modifier.padding(top = 10.dp)
                             )
 
-                            Column(horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = "Sunrise - 07:00",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(top = 15.dp,start = 40.dp)
-                                )
-
-                                Text(
-                                    text = "Sunset - 07:00",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(top = 5.dp,start = 40.dp)
-                                )
-                            }
-
-
+                            Text(
+                                text = "Partly cloudy",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier.padding(start = 56.dp, top = 18.dp)
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        Text(
-                            text = "Partly cloudy",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Normal
-                        )
+                        Column(horizontalAlignment = Alignment.Start
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Text(
+                                    text = "Sunrise",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(end = 10.dp)
+                                )
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
+                                    contentDescription = "Sunrise Icon",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+
+                                )
+
+                                Text(
+                                    text = "07:00",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(start = 10.dp)
+                                )
+
+                            }
+
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Text(
+                                    text = "Sunset",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
+                                    contentDescription = "Sunset Icon",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(23.dp)
+                                )
+
+                                Text(
+                                    text = "17:30",
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(start = 10.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
