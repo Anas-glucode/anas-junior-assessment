@@ -51,8 +51,11 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room3.common.jvm)
     implementation(libs.androidx.room3.runtime)
+    implementation(libs.espresso.core)
     implementation(libs.protolite.well.known.types)
     implementation(libs.transport.runtime)
     testImplementation(libs.junit)
@@ -71,5 +74,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 
     implementation("com.google.dagger:hilt-android:2.52")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     ksp("com.google.dagger:hilt-compiler:2.52")
+    ksp("androidx.room:room-compiler:2.6.1")
 }

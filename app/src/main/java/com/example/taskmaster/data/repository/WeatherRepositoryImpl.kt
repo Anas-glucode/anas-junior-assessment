@@ -11,10 +11,8 @@ class WeatherRepositoryImpl(
 ): WeatherRepository {
 
     override suspend fun getWeather(latitude: Double, longitude: Double): Weather {
-        // 1. Fetch the raw network DTO 📦
-        val dto = weatherService.getWeather(latitude, longitude)
 
-        // 2. Map it to the clean domain model and return it 🧼
+        val dto = weatherService.getWeather(latitude, longitude)
         return dto.toDomain()
     }
 }

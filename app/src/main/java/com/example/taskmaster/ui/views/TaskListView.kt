@@ -1,6 +1,9 @@
 package com.example.taskmaster.ui.views
 
+import android.R.attr.contentDescription
+import android.R.attr.tint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.paddingFrom
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -21,6 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -28,6 +32,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.DockedSearchBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -38,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,53 +55,39 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.taskmaster.R
-import com.example.taskmaster.domain.models.Task
-import org.intellij.lang.annotations.JdkConstants
+import com.example.taskmaster.ui.viewmodels.TaskViewModel
+import kotlin.collections.emptyList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListView() {
-    // 💾 State tracking
+fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
+
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("To Do") }
 
-    //Dummy data
-    data class TaskDummy(
-        val id: Int,
-        val title: String,
-        val description: String = "",
-        val indicatorColor: Color,
-        val isCompleted: Boolean
-    )
-    val sampleTasks = remember {
-        listOf(
-            TaskDummy(1, "Buy groceries", "Buy clover only",Color(0xFF3CFF9D),isCompleted = false),
-            TaskDummy(2, "Book flight tickets", "Look for discount on Emirates", Color(0xFFFFB44D),isCompleted = true),
-            TaskDummy(3, "Gym session", "At least minimum of 50 push ups", Color(0xFFFF88B2),isCompleted = true)
-        )
+    val tasks by viewModel.tasks.collectAsState(initial = emptyList())
+
+    val filteredTasks = tasks.filter { tasks ->
+        if(selectedTab == "To Do") {
+            !tasks.isCompleted
+        } else {
+            tasks.isCompleted
+        }
     }
-
-
 
     Scaffold(
         topBar = {
             DockedSearchBar(
                 query = searchQuery,
-                onQueryChange = { newText ->
-                    searchQuery = newText
-                },
-                onSearch = {
-                    // Executed when user presses the keyboard search button
-                },
+                onQueryChange = { newText -> searchQuery = newText },
+                onSearch = {},
                 active = isSearching,
-                onActiveChange = { activeState ->
-                    isSearching = activeState
-                },
+                onActiveChange = { activeState -> isSearching = activeState },
                 placeholder = { Text("Search messages") },
                 leadingIcon = {
                     if (isSearching) {
@@ -145,16 +138,17 @@ fun TaskListView() {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = { navController.navigate("createTask") },
                 containerColor = Color(0xFF0096FF),
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add,
+                Icon(
+                    Icons.Default.Add,
                     contentDescription = "Add New Task",
-                    modifier = Modifier.size(30.dp))
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
-
     ) { innerPadding ->
 
         LazyColumn(
@@ -186,7 +180,6 @@ fun TaskListView() {
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-
                                 Text(
                                     text = "South Africa | Africa",
                                     color = Color.White.copy(alpha = 0.75F),
@@ -201,7 +194,6 @@ fun TaskListView() {
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Medium
                                 )
-
                                 Text(
                                     text = "Sat May 9",
                                     color = Color.White.copy(alpha = 0.75F),
@@ -223,14 +215,12 @@ fun TaskListView() {
                                 fontSize = 100.sp,
                                 fontWeight = FontWeight.Normal,
                             )
-
                             Text(
                                 text = "°C",
                                 color = Color.White,
                                 fontSize = 50.sp,
                                 modifier = Modifier.padding(top = 10.dp)
                             )
-
                             Text(
                                 text = "Partly cloudy",
                                 color = Color.White,
@@ -242,31 +232,25 @@ fun TaskListView() {
 
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        Column(
-                            horizontalAlignment = Alignment.Start
-                        ) {
-
-                            // 🌅 Sunrise Row
+                        Column(horizontalAlignment = Alignment.Start) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically // 🎯 Centers items vertically
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     text = "Sunrise",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.width(75.dp) // 📐 Enforces a uniform column width
+                                    modifier = Modifier.width(75.dp)
                                 )
-
                                 Icon(
                                     painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
                                     contentDescription = "Sunrise Icon",
                                     tint = Color.White,
-                                    modifier = Modifier.size(24.dp) // 🌟 Matching icon size
+                                    modifier = Modifier.size(24.dp)
                                 )
-
                                 Text(
                                     text = "07:00",
                                     color = Color.White,
@@ -281,23 +265,21 @@ fun TaskListView() {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically // 🎯 Centers items vertically
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     text = "Sunset",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.width(75.dp) // 📐 Matches the sunrise width perfectly!
+                                    modifier = Modifier.width(75.dp)
                                 )
-
                                 Icon(
                                     painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
                                     contentDescription = "Sunset Icon",
                                     tint = Color.White,
-                                    modifier = Modifier.size(24.dp) // 🌟 Matching icon size
+                                    modifier = Modifier.size(24.dp)
                                 )
-
                                 Text(
                                     text = "17:30",
                                     color = Color.White,
@@ -316,17 +298,10 @@ fun TaskListView() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        8.dp,
-                        Alignment.CenterHorizontally
-                    ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         FilterChip(
                             selected = selectedTab == "To Do",
                             onClick = { selectedTab = "To Do" },
@@ -337,20 +312,17 @@ fun TaskListView() {
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             },
-                            modifier = Modifier.fillMaxWidth(), // 📐 Forces the chip to fill the Box width
+                            modifier = Modifier.fillMaxWidth(),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color.Black,
+                                selectedContainerColor = Color.DarkGray,
                                 selectedLabelColor = Color.White,
                                 containerColor = Color.White,
-                                labelColor = Color.Black
+                                labelColor = Color.Gray
                             )
                         )
                     }
 
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         FilterChip(
                             selected = selectedTab == "Completed",
                             onClick = { selectedTab = "Completed" },
@@ -361,74 +333,138 @@ fun TaskListView() {
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             },
-                            modifier = Modifier.fillMaxWidth(), // 📐 Forces the chip to fill the Box width
+                            modifier = Modifier.fillMaxWidth(),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color.Black,
+                                selectedContainerColor = Color.DarkGray,
                                 selectedLabelColor = Color.White,
                                 containerColor = Color.White,
-                                labelColor = Color.Black
+                                labelColor = Color.Gray
                             )
                         )
                     }
                 }
 
-                Card() {
-                    Column(modifier = Modifier
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = "Tasks",
+                    color = Color.Black,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+
+            items(filteredTasks) { task ->
+
+                var isMenuExpanded by remember { mutableStateOf(false) }
+
+                Card(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0x97E7E5E5))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     ) {
-                        Row(modifier = Modifier.fillMaxWidth(),
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-                            Row(verticalAlignment = Alignment.CenterVertically,
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-
                                 Box(
                                     modifier = Modifier
                                         .size(24.dp)
                                         .clip(CircleShape)
-                                        .background(Color(0xFFFF88B2)),
+                                        .background(Color(0xFF0288E5))
+                                        .clickable{
+                                            val updatedTask = task.copy(isCompleted = !task.isCompleted)
+                                            viewModel.addTask(updatedTask)
+                                        },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(20.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.White),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-
+                                    if (!task.isCompleted) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .clip(CircleShape)
+                                                .background(Color.White)
+                                        )
                                     }
                                 }
 
-                                Column(){
-
+                                Column {
                                     Text(
-                                        text ="Pack Suitcase",
-                                        fontSize = 20.sp,
+                                        text = task.title,
+                                        fontSize = 22.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = Color.Black
                                     )
-
                                     Spacer(modifier = Modifier.height(1.dp))
-
                                     Text(
-                                        text = "Pack in blue bag not the black one",
+                                        text = task.description,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Normal,
                                         color = Color.Black.copy(alpha = 0.30F),
                                     )
                                 }
+                            }
 
-                                 Icon(
-                                     imageVector = Icons.Default.MoreVert,
-                                     contentDescription = "Menu to edit/delete",
-                                     tint = Color.Gray,
-                                     modifier = Modifier.padding(start = 70.dp)
-                                 )
+                            Box {
+                                IconButton(onClick = {isMenuExpanded = true}) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "Menu to edit/delete",
+                                        tint = Color.Gray,
+                                        modifier = Modifier.size(30.dp)
+                                    )
+                                }
+
+                                DropdownMenu(
+                                    expanded = isMenuExpanded,
+                                    onDismissRequest = { isMenuExpanded = false }
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text("Edit")},
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Edit Task"
+                                            )
+                                        },
+                                        onClick = {
+                                            isMenuExpanded = false
+                                            navController.navigate("editTask/${task.id}")
+                                        }
+                                    )
+
+                                    DropdownMenuItem(
+                                        text = {Text("Delete")},
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Delete Task",
+                                                tint = Color.Red
+                                            )
+                                        },
+                                        onClick = {
+                                            isMenuExpanded = false
+                                            viewModel.deleteTask(task)
+                                        }
+
+                                    )
+                                }
                             }
                         }
                     }
@@ -438,12 +474,4 @@ fun TaskListView() {
     }
 }
 
-
-@Preview
-@Composable
-fun TaskListViewPreview() {
-    MaterialTheme{
-        TaskListView()
-    }
-}
 

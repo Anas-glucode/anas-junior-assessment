@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class TaskRepositoryImpl(
-    private val dao: TaskDao // Best practice to use 'val' instead of 'var'
+    private val dao: TaskDao
 ): TaskRepository {
 
     override suspend fun insertTask(task: Task) {
@@ -21,7 +21,6 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getTaskById(id: Int): Task {
-        // Handle null case gracefully if ID doesn't exist
         return dao.getTaskById(id)?.toDomain() ?: Task(title = "", description = "", isCompleted = false)
     }
 

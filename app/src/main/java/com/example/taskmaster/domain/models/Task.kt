@@ -9,7 +9,6 @@ data class Task(
     val isCompleted: Boolean
 )
 
-// Extension functions to convert between the two layers easily
 fun Task.toEntity(): TaskEntity {
     return TaskEntity(
         id = this.id,

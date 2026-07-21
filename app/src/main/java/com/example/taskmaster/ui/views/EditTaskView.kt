@@ -1,7 +1,6 @@
 package com.example.taskmaster.ui.views
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,65 +15,50 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.taskmaster.domain.models.Task
-import com.example.taskmaster.ui.viewmodels.TaskViewModel
-
+import com.example.taskmaster.ui.viewmodels.EditTaskViewModel
 
 @Composable
-fun CreateTaskView(
+fun EditTaskView(
     navController: NavController,
-    viewModel: TaskViewModel
+    viewModel: EditTaskViewModel = hiltViewModel()
 ) {
-
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 20.dp, vertical = 90.dp)
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 90.dp)
     ) {
 
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically){
-
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = "Create Task",
+                text = "Edit Task",
                 fontSize = 35.sp,
                 fontWeight = FontWeight.Medium
             )
 
             Button(
                 onClick = {
-                    val newTask = Task(title = title, description = description, isCompleted = false)
-
-                    viewModel.addTask(newTask)
-
-                    navController.popBackStack()
-
+                    viewModel.updateTask {
+                        navController.popBackStack()
+                    }
                 },
                 modifier = Modifier.size(45.dp),
                 shape = CircleShape,
@@ -82,14 +66,12 @@ fun CreateTaskView(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF0288E5),
                 )
-
             ) {
-               Icon(
-                   imageVector = Icons.Default.Check,
-                   contentDescription = "Check Icon",
-                   modifier = Modifier.size(30.dp)
-               )
-
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Save Task Icon",
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
 
@@ -104,8 +86,8 @@ fun CreateTaskView(
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = title,
-            onValueChange = { title = it },
+            value = viewModel.taskTitle,
+            onValueChange = viewModel::onTitleChange,
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = Color.Gray,
@@ -124,12 +106,10 @@ fun CreateTaskView(
             fontWeight = FontWeight.Medium
         )
 
-
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
-            value = description,
-            onValueChange = {description = it},
+            modifier = Modifier.fillMaxWidth(),
+            value = viewModel.taskDescription,
+            onValueChange = viewModel::onDescriptionChange,
             minLines = 5,
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(

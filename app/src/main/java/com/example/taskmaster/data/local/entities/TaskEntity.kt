@@ -1,7 +1,7 @@
 package com.example.taskmaster.data.local.entities
 
-import androidx.room3.Entity
-import androidx.room3.PrimaryKey
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity
 data class TaskEntity(

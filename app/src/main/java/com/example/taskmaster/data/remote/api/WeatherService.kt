@@ -9,7 +9,6 @@ class WeatherService(
     private val client: HttpClient
 ) {
     suspend fun getWeather(latitude: Double, longitude: Double): WeatherDto {
-        // We added the comma to separate coordinates and targeted the DTO class
         val response: WeatherDto = client
             .get("https://api.weatherapi.com/v1/current.json?key=3ed65871a29947d7991110518261607&q=$latitude,$longitude")
             .body()
