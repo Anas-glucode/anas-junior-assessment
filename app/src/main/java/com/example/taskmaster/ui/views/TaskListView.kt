@@ -72,12 +72,15 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
 
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
 
-    val filteredTasks = tasks.filter { tasks ->
-        if(selectedTab == "To Do") {
-            !tasks.isCompleted
-        } else {
-            tasks.isCompleted
-        }
+    val filteredTasks = tasks.filter { task ->
+
+        val matchesTab = if (selectedTab == "To Do") !task.isCompleted else task.isCompleted
+
+        val matchesSearch = searchQuery.isEmpty() ||
+                task.title.contains(searchQuery, ignoreCase = true) ||
+                task.description.contains(searchQuery, ignoreCase = true)
+
+        matchesTab && matchesSearch
     }
 
     Scaffold(
@@ -88,7 +91,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                 onSearch = {},
                 active = isSearching,
                 onActiveChange = { activeState -> isSearching = activeState },
-                placeholder = { Text("Search messages") },
+                placeholder = { Text("Search tasks") },
                 leadingIcon = {
                     if (isSearching) {
                         IconButton(onClick = { isSearching = false }) {
