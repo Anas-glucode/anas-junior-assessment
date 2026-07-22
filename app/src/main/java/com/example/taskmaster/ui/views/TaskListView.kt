@@ -1,7 +1,5 @@
 package com.example.taskmaster.ui.views
 
-import android.R.attr.contentDescription
-import android.R.attr.tint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

@@ -10,7 +10,7 @@ class WeatherService(
 ) {
     suspend fun getWeather(latitude: Double, longitude: Double): WeatherDto {
         val response: WeatherDto = client
-            .get("https://api.weatherapi.com/v1/current.json?key=3ed65871a29947d7991110518261607&q=$latitude,$longitude")
+            .get("https://api.weatherapi.com/v1/forecast.json?key=3ed65871a29947d7991110518261607&q=$latitude,$longitude&days=1")
             .body()
         return response
     }
