@@ -41,7 +41,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,11 +62,6 @@ import kotlin.collections.emptyList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
-
-    // Trigger weather fetch when screen is launched
-    LaunchedEffect(Unit) {
-        viewModel.fetchWeather(-26.183, 28.05)
-    }
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
