@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -68,13 +70,17 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended")
 
+// Ktor Client (CIO Engine & Serialization)
     implementation("io.ktor:ktor-client-core:2.3.12")
-    implementation("io.ktor:ktor-client-android:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 
+// Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.52")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     ksp("com.google.dagger:hilt-compiler:2.52")
+
+// Room Compiler
     ksp("androidx.room:room-compiler:2.6.1")
 }

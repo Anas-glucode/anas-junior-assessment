@@ -38,10 +38,10 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,10 +64,16 @@ import kotlin.collections.emptyList
 @Composable
 fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
 
+    // Trigger weather fetch when screen is launched
+    LaunchedEffect(Unit) {
+        viewModel.fetchWeather(-26.183, 28.05)
+    }
+
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("To Do") }
 
+    val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
 
     val filteredTasks = tasks.filter { task ->
@@ -176,13 +182,13 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                         ) {
                             Column {
                                 Text(
-                                    text = "Johannesburg",
+                                    text = weatherState?.location?.name ?: "Loading...",
                                     color = Color.White,
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = "South Africa | Africa",
+                                    text = "${weatherState?.location?.country ?: "--"} | ${weatherState?.location?.region ?: "--"}",
                                     color = Color.White.copy(alpha = 0.75F),
                                     fontSize = 16.sp,
                                 )
@@ -190,15 +196,10 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
 
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "20:24",
+                                    text = weatherState?.location?.localtime?.split(" ")?.getOrNull(1) ?: "--:--",
                                     color = Color.White,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = "Sat May 9",
-                                    color = Color.White.copy(alpha = 0.75F),
-                                    fontSize = 16.sp,
                                 )
                             }
                         }
@@ -211,7 +212,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                             verticalAlignment = Alignment.Top
                         ) {
                             Text(
-                                text = "24",
+                                text = weatherState?.tempC?.toInt()?.toString() ?: "--",
                                 color = Color.White,
                                 fontSize = 100.sp,
                                 fontWeight = FontWeight.Normal,
@@ -223,11 +224,11 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                 modifier = Modifier.padding(top = 10.dp)
                             )
                             Text(
-                                text = "Partly cloudy",
+                                text = weatherState?.condition ?: "",
                                 color = Color.White,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Normal,
-                                modifier = Modifier.padding(start = 56.dp, top = 18.dp)
+                                modifier = Modifier.padding(start = 32.dp, top = 18.dp)
                             )
                         }
 
@@ -253,7 +254,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "07:00",
+                                    text = weatherState?.sunrise ?: "--:--",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
@@ -282,7 +283,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "17:30",
+                                    text = weatherState?.sunset ?: "--:--",
                                     color = Color.White,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Normal,
@@ -358,7 +359,6 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-
             items(filteredTasks) { task ->
 
                 var isMenuExpanded by remember { mutableStateOf(false) }
@@ -389,7 +389,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                         .size(24.dp)
                                         .clip(CircleShape)
                                         .background(Color(0xFF0288E5))
-                                        .clickable{
+                                        .clickable {
                                             val updatedTask = task.copy(isCompleted = !task.isCompleted)
                                             viewModel.addTask(updatedTask)
                                         },
@@ -423,7 +423,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                             }
 
                             Box {
-                                IconButton(onClick = {isMenuExpanded = true}) {
+                                IconButton(onClick = { isMenuExpanded = true }) {
                                     Icon(
                                         imageVector = Icons.Default.MoreVert,
                                         contentDescription = "Menu to edit/delete",
@@ -437,7 +437,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     onDismissRequest = { isMenuExpanded = false }
                                 ) {
                                     DropdownMenuItem(
-                                        text = { Text("Edit")},
+                                        text = { Text("Edit") },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Edit,
@@ -451,7 +451,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     )
 
                                     DropdownMenuItem(
-                                        text = {Text("Delete")},
+                                        text = { Text("Delete") },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Delete,
@@ -463,7 +463,6 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                             isMenuExpanded = false
                                             viewModel.deleteTask(task)
                                         }
-
                                     )
                                 }
                             }
@@ -474,5 +473,3 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
         }
     }
 }
-
-

@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WeatherDto(
     @SerialName("location") val location: LocationDto,
-    @SerialName("current") val current: CurrentDto
+    @SerialName("current") val current: CurrentDto,
+    @SerialName("forecast") val forecast: ForecastDto? = null
 )
 
 @Serializable
@@ -24,11 +25,34 @@ data class LocationDto(
 
 @Serializable
 data class CurrentDto(
-    @SerialName("temp_c") val tempC: Double
+    @SerialName("temp_c") val tempC: Double,
+    val condition: ConditionDto
 )
 
+@Serializable
+data class ConditionDto(
+    @SerialName("text") val text: String,
+    @SerialName("icon") val icon: String
+)
+
+@Serializable
+data class ForecastDto(
+    @SerialName("forecastday") val forecastday: List<ForecastDayDto> = emptyList()
+)
+
+@Serializable
+data class ForecastDayDto(
+    @SerialName("astro") val astro: AstroDto
+)
+
+@Serializable
+data class AstroDto(
+    @SerialName("sunrise") val sunrise: String,
+    @SerialName("sunset") val sunset: String
+)
 
 fun WeatherDto.toDomain(): Weather {
+    val astro = this.forecast?.forecastday?.firstOrNull()?.astro
     return Weather(
         location = Location(
             name = this.location.name,
@@ -40,7 +64,8 @@ fun WeatherDto.toDomain(): Weather {
             localtime = this.location.localtime
         ),
         tempC = this.current.tempC,
-        sunrise = "--:--",
-        sunset = "--:--"
+        condition = this.current.condition.text,
+        sunrise = astro?.sunrise ?: "--:--",
+        sunset = astro?.sunset ?: "--:--"
     )
 }
