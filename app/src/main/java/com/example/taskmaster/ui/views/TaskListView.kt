@@ -89,8 +89,8 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                 query = searchQuery,
                 onQueryChange = { newText -> searchQuery = newText },
                 onSearch = {},
-                active = isSearching,
-                onActiveChange = { activeState -> isSearching = activeState },
+                active = false,
+                onActiveChange = {},
                 placeholder = { Text("Search tasks") },
                 leadingIcon = {
                     if (isSearching) {
