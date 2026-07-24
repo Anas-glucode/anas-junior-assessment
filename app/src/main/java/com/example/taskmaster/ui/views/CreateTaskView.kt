@@ -14,9 +14,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -41,7 +43,6 @@ fun CreateTaskView(
     navController: NavController,
     viewModel: TaskViewModel
 ) {
-
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
@@ -65,27 +66,45 @@ fun CreateTaskView(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Button(
-                onClick = {
-                    val newTask = Task(title = title, description = description, isCompleted = false)
-
-                    viewModel.addTask(newTask)
-
-                    navController.popBackStack()
-                },
-                modifier = Modifier.size(45.dp),
-                shape = CircleShape,
-                contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
-                )
+            // Action Buttons Row (Cancel & Save)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Check Icon",
-                    modifier = Modifier.size(30.dp)
-                )
+                // Cancel Button
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.size(45.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel Icon",
+                        tint = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+
+                // Save Button
+                Button(
+                    onClick = {
+                        val newTask = Task(title = title, description = description, isCompleted = false)
+                        viewModel.addTask(newTask)
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier.size(45.dp),
+                    shape = CircleShape,
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Check Icon",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
             }
         }
 
