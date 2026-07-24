@@ -5,7 +5,7 @@ import com.example.taskmaster.domain.models.TaskWithWeather
 import com.example.taskmaster.domain.repos.TaskRepository
 import com.example.taskmaster.domain.repos.WeatherRepository
 
-class GetTasksWithWeatherUsecase @Inject constructor(
+class GetTasksWithWeatherUseCase @Inject constructor(
     private val taskRepository: TaskRepository,
     private val weatherRepository: WeatherRepository
 ) {
@@ -13,9 +13,9 @@ class GetTasksWithWeatherUsecase @Inject constructor(
         taskId: Int,
         latitude: Double,
         longitude: Double
-    ): TaskWithWeather {
+    ): TaskWithWeather? {
 
-        val task = taskRepository.getTaskById(taskId)
+        val task = taskRepository.getTaskById(taskId) ?: return null
 
         val weather = weatherRepository.getWeather(latitude, longitude)
 

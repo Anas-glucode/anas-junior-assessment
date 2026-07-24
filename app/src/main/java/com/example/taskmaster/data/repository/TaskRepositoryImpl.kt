@@ -20,8 +20,8 @@ class TaskRepositoryImpl(
         dao.deleteTask(task.toEntity())
     }
 
-    override suspend fun getTaskById(id: Int): Task {
-        return dao.getTaskById(id)?.toDomain() ?: Task(title = "", description = "", isCompleted = false)
+    override suspend fun getTaskById(id: Int): Task? {
+        return dao.getTaskById(id)?.toDomain()
     }
 
     override fun getTask(): Flow<List<Task>> {

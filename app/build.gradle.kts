@@ -71,6 +71,9 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended")
 
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+
 // Ktor Client (CIO Engine & Serialization)
     implementation("io.ktor:ktor-client-core:2.3.12")
     implementation("io.ktor:ktor-client-cio:2.3.12")

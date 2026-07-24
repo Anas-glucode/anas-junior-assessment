@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.example.taskmaster.data.local.database.TaskDao
 import com.example.taskmaster.data.local.database.TaskDatabase
+import com.example.taskmaster.data.remote.api.WeatherApi
 import com.example.taskmaster.data.remote.api.WeatherService
 import com.example.taskmaster.data.repository.TaskRepositoryImpl
 import com.example.taskmaster.data.repository.WeatherRepositoryImpl
@@ -39,14 +40,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideWeatherService(client: HttpClient): WeatherService {
+    fun provideWeatherApi(client: HttpClient): WeatherApi {
         return WeatherService(client)
     }
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(weatherService: WeatherService): WeatherRepository {
-        return WeatherRepositoryImpl(weatherService)
+    fun provideWeatherRepository(weatherApi: WeatherApi): WeatherRepository {
+        return WeatherRepositoryImpl(weatherApi)
     }
 
     @Provides

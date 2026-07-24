@@ -1,14 +1,16 @@
 package com.example.taskmaster.data.repository
 
-import com.example.taskmaster.data.remote.api.WeatherService
+import com.example.taskmaster.data.remote.api.WeatherApi
 import com.example.taskmaster.domain.models.Weather
 import com.example.taskmaster.domain.repos.WeatherRepository
 import com.example.taskmaster.data.remote.dto.WeatherDto
 import com.example.taskmaster.data.remote.dto.toDomain
 
 class WeatherRepositoryImpl(
-    private val weatherService: WeatherService
+    private val weatherApi: WeatherApi,
+    private val clock: () -> Long = System::currentTimeMillis
 ): WeatherRepository {
+
 
     private data class CacheEntry(
         val weather: Weather,
@@ -20,7 +22,7 @@ class WeatherRepositoryImpl(
     private var cache: CacheEntry? = null
 
     override suspend fun getWeather(latitude: Double, longitude: Double): Weather {
-        val now = System.currentTimeMillis()
+        val now = clock()
         val cached = cache
 
         val isCacheFresh = cached != null &&
@@ -31,7 +33,7 @@ class WeatherRepositoryImpl(
             return cached!!.weather
         }
 
-        val dto = weatherService.getWeather(latitude, longitude)
+        val dto = weatherApi.getWeather(latitude, longitude)
         val weather = dto.toDomain()
 
         cache = CacheEntry(

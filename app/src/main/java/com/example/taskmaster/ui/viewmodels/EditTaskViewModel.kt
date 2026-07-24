@@ -25,12 +25,18 @@ class EditTaskViewModel @Inject constructor(
     var taskDescription by mutableStateOf("")
         private set
 
+    var taskNotFound by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             val task = repository.getTaskById(taskId)
-            taskTitle = task.title
-
-            taskDescription = task.description
+            if (task != null) {
+                taskTitle = task.title
+                taskDescription = task.description
+            } else {
+                taskNotFound = true
+            }
         }
     }
 
@@ -45,13 +51,15 @@ class EditTaskViewModel @Inject constructor(
     fun updateTask(onSuccess: () -> Unit) {
         viewModelScope.launch {
             val existingTask = repository.getTaskById(taskId)
-            existingTask?.let {
-                val updatedTask = it.copy(
+            if (existingTask != null) {
+                val updatedTask = existingTask.copy(
                     title = taskTitle,
                     description = taskDescription
                 )
                 repository.insertTask(updatedTask)
                 onSuccess()
+            } else {
+                taskNotFound = true
             }
         }
     }

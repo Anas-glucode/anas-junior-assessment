@@ -9,7 +9,7 @@ interface TaskRepository {
 
     suspend fun deleteTask(task: Task)
 
-    suspend fun getTaskById(id: Int): Task
+    suspend fun getTaskById(id: Int): Task?
 
     fun getTask(): Flow<List<Task>>
 }

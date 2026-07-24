@@ -7,8 +7,8 @@ import io.ktor.client.request.get
 
 class WeatherService(
     private val client: HttpClient
-) {
-    suspend fun getWeather(latitude: Double, longitude: Double): WeatherDto {
+) : WeatherApi {
+    override suspend fun getWeather(latitude: Double, longitude: Double): WeatherDto {
         val response: WeatherDto = client
             .get("https://api.weatherapi.com/v1/forecast.json?key=3ed65871a29947d7991110518261607&q=$latitude,$longitude&days=1")
             .body()
