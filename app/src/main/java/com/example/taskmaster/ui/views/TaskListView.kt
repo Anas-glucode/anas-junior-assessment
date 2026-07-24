@@ -33,13 +33,14 @@ import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -53,7 +54,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -71,6 +71,9 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
 
     val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
+
+    val tabs = listOf("To Do", "Completed")
+    val selectedTabIndex = if (selectedTab == "To Do") 0 else 1
 
     val filteredTasks = tasks.filter { task ->
 
@@ -192,10 +195,11 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
 
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = weatherState?.location?.localtime?.split(" ")?.getOrNull(1) ?: "--:--",
+                                    text = weatherState?.condition ?: "",
                                     color = Color.White,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    modifier = Modifier.padding(start = 30.dp,)
                                 )
                             }
                         }
@@ -218,13 +222,6 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                 color = Color.White,
                                 fontSize = 50.sp,
                                 modifier = Modifier.padding(top = 10.dp)
-                            )
-                            Text(
-                                text = weatherState?.condition ?: "",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Normal,
-                                modifier = Modifier.padding(start = 32.dp, top = 18.dp)
                             )
                         }
 
@@ -292,52 +289,39 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
             }
 
             item {
-                Row(
+                SecondaryTabRow(
+                    selectedTabIndex = selectedTabIndex,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        FilterChip(
-                            selected = selectedTab == "To Do",
-                            onClick = { selectedTab = "To Do" },
-                            label = {
-                                Text(
-                                    "To Do",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicator = {
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = false),
+                            color = MaterialTheme.colorScheme.primary
                         )
-                    }
+                    },
+                    divider = {}
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        val isSelected = selectedTabIndex == index
 
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        FilterChip(
-                            selected = selectedTab == "Completed",
-                            onClick = { selectedTab = "Completed" },
-                            label = {
+                        Tab(
+                            selected = isSelected,
+                            onClick = { selectedTab = title },
+                            text = {
                                 Text(
-                                    "Completed",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
+                                    text = title,
+                                    fontSize = 16.sp,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                    color = if (isSelected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    }
                                 )
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            }
                         )
                     }
                 }
