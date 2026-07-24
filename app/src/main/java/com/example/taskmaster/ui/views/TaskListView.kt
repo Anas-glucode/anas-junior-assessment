@@ -380,7 +380,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                             modifier = Modifier
                                                 .size(20.dp)
                                                 .clip(CircleShape)
-                                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                                .background(MaterialTheme.colorScheme.surface)
                                         )
                                     }
                                 }
