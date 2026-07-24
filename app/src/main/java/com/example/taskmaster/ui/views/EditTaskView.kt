@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -51,7 +52,8 @@ fun EditTaskView(
             Text(
                 text = "Edit Task",
                 fontSize = 35.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Button(
@@ -64,7 +66,8 @@ fun EditTaskView(
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0288E5),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
                 )
             ) {
                 Icon(
@@ -81,7 +84,8 @@ fun EditTaskView(
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Task Name",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         OutlinedTextField(
@@ -90,10 +94,13 @@ fun EditTaskView(
             onValueChange = viewModel::onTitleChange,
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = Color.Gray,
-                focusedBorderColor = Color(0xFF0288E5),
-                unfocusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
 
@@ -103,7 +110,8 @@ fun EditTaskView(
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Description",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         OutlinedTextField(
@@ -113,10 +121,13 @@ fun EditTaskView(
             minLines = 5,
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = Color.Gray,
-                unfocusedBorderColor = Color.Black,
-                focusedBorderColor = Color(0xFF0288E5),
-                focusedLabelColor = Color.Black,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
     }

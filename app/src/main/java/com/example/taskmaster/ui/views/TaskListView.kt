@@ -38,6 +38,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -140,7 +142,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("createTask") },
-                containerColor = Color(0xFF0096FF),
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White
             ) {
                 Icon(
@@ -305,15 +307,15 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                 Text(
                                     "To Do",
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    textAlign = TextAlign.Center
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color.DarkGray,
-                                selectedLabelColor = Color.White,
-                                containerColor = Color.White,
-                                labelColor = Color.Gray
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -326,15 +328,15 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                 Text(
                                     "Completed",
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    textAlign = TextAlign.Center
                                 )
                             },
                             modifier = Modifier.fillMaxWidth(),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color.DarkGray,
-                                selectedLabelColor = Color.White,
-                                containerColor = Color.White,
-                                labelColor = Color.Gray
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -345,7 +347,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text = "Tasks",
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -361,7 +363,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0x97E7E5E5))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Column(
                         modifier = Modifier
@@ -382,7 +384,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     modifier = Modifier
                                         .size(24.dp)
                                         .clip(CircleShape)
-                                        .background(Color(0xFF0288E5))
+                                        .background(MaterialTheme.colorScheme.primary)
                                         .clickable {
                                             val updatedTask = task.copy(isCompleted = !task.isCompleted)
                                             viewModel.addTask(updatedTask)
@@ -394,7 +396,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                             modifier = Modifier
                                                 .size(20.dp)
                                                 .clip(CircleShape)
-                                                .background(Color.White)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant)
                                         )
                                     }
                                 }
@@ -404,14 +406,14 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                         text = task.title,
                                         fontSize = 22.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = Color.Black
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Spacer(modifier = Modifier.height(1.dp))
                                     Text(
                                         text = task.description,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Normal,
-                                        color = Color.Black.copy(alpha = 0.30F),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                             }
@@ -421,7 +423,7 @@ fun TaskListView(navController: NavController, viewModel: TaskViewModel) {
                                     Icon(
                                         imageVector = Icons.Default.MoreVert,
                                         contentDescription = "Menu to edit/delete",
-                                        tint = Color.Gray,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.size(30.dp)
                                     )
                                 }

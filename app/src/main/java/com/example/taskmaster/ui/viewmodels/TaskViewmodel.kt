@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
@@ -43,7 +44,7 @@ class TaskViewModel @Inject constructor(
         weatherRefreshJob = viewModelScope.launch {
             while (isActive) {
                 fetchWeather(latitude, longitude)
-                delay(WEATHER_REFRESH_INTERVAL_MILLIS)
+                delay(WEATHER_REFRESH_INTERVAL_MILLIS.milliseconds)
             }
         }
     }

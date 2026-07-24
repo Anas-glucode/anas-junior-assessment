@@ -1,7 +1,6 @@
 package com.example.taskmaster.ui.views
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,13 +15,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,14 +30,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.taskmaster.domain.models.Task
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
-
 
 @Composable
 fun CreateTaskView(
@@ -53,18 +48,21 @@ fun CreateTaskView(
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 20.dp, vertical = 90.dp)
+            .fillMaxSize()
+            .padding(horizontal = 20.dp, vertical = 90.dp)
     ) {
 
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically){
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
             Text(
                 text = "Create Task",
                 fontSize = 35.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Button(
@@ -74,22 +72,20 @@ fun CreateTaskView(
                     viewModel.addTask(newTask)
 
                     navController.popBackStack()
-
                 },
                 modifier = Modifier.size(45.dp),
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0288E5),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
                 )
-
             ) {
-               Icon(
-                   imageVector = Icons.Default.Check,
-                   contentDescription = "Check Icon",
-                   modifier = Modifier.size(30.dp)
-               )
-
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Check Icon",
+                    modifier = Modifier.size(30.dp)
+                )
             }
         }
 
@@ -99,7 +95,8 @@ fun CreateTaskView(
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Task Name",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         OutlinedTextField(
@@ -108,10 +105,13 @@ fun CreateTaskView(
             onValueChange = { title = it },
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = Color.Gray,
-                focusedBorderColor = Color(0xFF0288E5),
-                unfocusedBorderColor = Color.Black,
-                focusedLabelColor = Color.Black,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
 
@@ -121,22 +121,24 @@ fun CreateTaskView(
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Description",
             fontSize = 20.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
-
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             value = description,
-            onValueChange = {description = it},
+            onValueChange = { description = it },
             minLines = 5,
             shape = RoundedCornerShape(15.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = Color.Gray,
-                unfocusedBorderColor = Color.Black,
-                focusedBorderColor = Color(0xFF0288E5),
-                focusedLabelColor = Color.Black,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             )
         )
     }
