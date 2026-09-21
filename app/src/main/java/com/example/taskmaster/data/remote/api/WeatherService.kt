@@ -1,6 +1,7 @@
 package com.example.taskmaster.data.remote.api
 
 import com.example.taskmaster.data.remote.dto.WeatherDto
+import com.example.taskmaster.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -9,8 +10,9 @@ class WeatherService(
     private val client: HttpClient
 ) : WeatherApi {
     override suspend fun getWeather(latitude: Double, longitude: Double): WeatherDto {
+        val apiKey = BuildConfig.WEATHER_API_KEY
         val response: WeatherDto = client
-            .get("https://api.weatherapi.com/v1/forecast.json?key=3ed65871a29947d7991110518261607&q=$latitude,$longitude&days=1")
+            .get("https://api.weatherapi.com/v1/forecast.json?key=$apiKey&q=$latitude,$longitude&days=1")
             .body()
         return response
     }
