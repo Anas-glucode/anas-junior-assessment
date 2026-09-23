@@ -1,11 +1,7 @@
 package com.example.taskmaster.ui.views
 
-
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,25 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -43,6 +30,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,21 +40,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.taskmaster.R
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
-import kotlin.collections.emptyList
+import com.example.taskmaster.ui.views.components.TaskItemRow
+import com.example.taskmaster.ui.views.components.WeatherCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListView(
     navController: NavController, viewModel: TaskViewModel
 ) {
-
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("To Do") }
@@ -74,314 +60,133 @@ fun TaskListView(
     val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
 
+    LaunchedEffect(Unit) {
+        viewModel.fetchWeather(-26.183, 28.05)
+    }
+
     val tabs = listOf("To Do", "Completed")
     val selectedTabIndex = if (selectedTab == "To Do") 0 else 1
 
     val filteredTasks = tasks.filter { task ->
-
-        val matchesTab = if (selectedTab == "To Do") {
-            !task.isCompleted
-        } else {
-            task.isCompleted
-        }
-
+        val matchesTab = if (selectedTab == "To Do") !task.isCompleted else task.isCompleted
         val matchesSearch = searchQuery.isEmpty() || task.title.contains(
-            searchQuery,
-            ignoreCase = true
+            searchQuery, ignoreCase = true
         ) || task.description.contains(searchQuery, ignoreCase = true)
 
         matchesTab && matchesSearch
     }
 
-    Scaffold(
-        topBar = {
-            Box(
+    Scaffold(topBar = {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .height(56.dp)
+                .clip(RoundedCornerShape(28.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
                     .height(56.dp)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    if (isSearching) {
-                        IconButton(
-                            onClick = {
-                                isSearching = false
-                                searchQuery = ""
-                            }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
-                            )
-                        }
-                    } else {
+                if (isSearching) {
+                    IconButton(onClick = {
+                        isSearching = false
+                        searchQuery = ""
+                    }) {
                         Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search",
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp)
-                                .size(24.dp),
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                            .size(24.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (searchQuery.isEmpty()) {
+                        Text(
+                            text = "Search tasks",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                    BasicTextField(
+                        value = searchQuery, onValueChange = {
+                            searchQuery = it
+                            isSearching = true
+                        }, singleLine = true, textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        ), modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                if (isSearching && searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear text",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                }
 
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-
-                        if (searchQuery.isEmpty()) {
-                            Text(
-                                text = "Search tasks",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 16.sp
-                            )
-                        }
-
-                        BasicTextField(
-                            value = searchQuery,
-                            onValueChange = {
-                                searchQuery = it
-                                isSearching = true
-                            },
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    if (isSearching && searchQuery.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                searchQuery = ""
-                            }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear text",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Mic,
-                            contentDescription = "Voice search",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                IconButton(onClick = { }) {
+                    Icon(
+                        imageVector = Icons.Default.Mic,
+                        contentDescription = "Voice search",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
-        },
-
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate("createTask")
-                }, containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.White
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Add New Task",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-        }) { innerPadding ->
-
+        }
+    }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = { navController.navigate("createTask") },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = Color.White
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add New Task",
+                modifier = Modifier.size(30.dp)
+            )
+        }
+    }) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxWidth(), contentPadding = innerPadding
         ) {
-
             item {
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = cardColors(
-                        containerColor = Color(0xFF0096FF)
-                    )
-                ) {
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.Top
-                        ) {
-
-                            Column {
-
-                                Text(
-                                    text = weatherState?.location?.name ?: "Loading...",
-                                    color = Color.White,
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                Text(
-                                    text = "${weatherState?.location?.country ?: "--"} | ${weatherState?.location?.region ?: "--"}",
-                                    color = Color.White.copy(alpha = 0.75F),
-                                    fontSize = 16.sp,
-                                )
-                            }
-
-                            Column(
-                                horizontalAlignment = Alignment.End
-                            ) {
-
-                                Text(
-                                    text = weatherState?.condition ?: "",
-                                    color = Color.White,
-                                    fontSize = 22.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    modifier = Modifier.padding(start = 30.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(
-                            modifier = Modifier.height(10.dp)
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.Top
-                        ) {
-
-                            Text(
-                                text = weatherState?.tempC?.toInt()?.toString() ?: "--",
-                                color = Color.White,
-                                fontSize = 100.sp,
-                                fontWeight = FontWeight.Normal,
-                            )
-
-                            Text(
-                                text = "°C",
-                                color = Color.White,
-                                fontSize = 50.sp,
-                                modifier = Modifier.padding(top = 10.dp)
-                            )
-                        }
-
-                        Spacer(
-                            modifier = Modifier.height(10.dp)
-                        )
-
-                        Column(
-                            horizontalAlignment = Alignment.Start
-                        ) {
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Text(
-                                    text = "Sunrise",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.width(75.dp)
-                                )
-
-                                Icon(
-                                    painter = painterResource(
-                                        id = R.drawable.sunrise_svgrepo_com
-                                    ),
-                                    contentDescription = "Sunrise Icon",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
-                                )
-
-                                Text(
-                                    text = weatherState?.sunrise ?: "--:--",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(start = 12.dp)
-                                )
-                            }
-
-                            Spacer(
-                                modifier = Modifier.height(5.dp)
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Text(
-                                    text = "Sunset",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.width(75.dp)
-                                )
-
-                                Icon(
-                                    painter = painterResource(
-                                        id = R.drawable.sunset_down_svgrepo_com
-                                    ),
-                                    contentDescription = "Sunset Icon",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
-                                )
-
-                                Text(
-                                    text = weatherState?.sunset ?: "--:--",
-                                    color = Color.White,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    modifier = Modifier.padding(start = 12.dp)
-                                )
-                            }
-                        }
-                    }
-                }
+                WeatherCard(weatherState = weatherState)
             }
-
             item {
-
                 SecondaryTabRow(
                     selectedTabIndex = selectedTabIndex,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            horizontal = 16.dp, vertical = 8.dp
-                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .clip(RoundedCornerShape(8.dp)),
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     indicator = {
-
                         TabRowDefaults.SecondaryIndicator(
                             modifier = Modifier.tabIndicatorOffset(
                                 selectedTabIndex, matchContentSize = false
@@ -389,33 +194,20 @@ fun TaskListView(
                         )
                     },
                     divider = {}) {
-
                     tabs.forEachIndexed { index, title ->
-
                         val isSelected = selectedTabIndex == index
-
-                        Tab(selected = isSelected, onClick = {
-                            selectedTab = title
-                        }, text = {
-
+                        Tab(selected = isSelected, onClick = { selectedTab = title }, text = {
                             Text(
-                                text = title, fontSize = 16.sp, fontWeight = if (isSelected) {
-                                    FontWeight.SemiBold
-                                } else {
-                                    FontWeight.Normal
-                                }, color = if (isSelected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                }
+                                text = title,
+                                fontSize = 16.sp,
+                                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         })
                     }
                 }
 
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -425,156 +217,19 @@ fun TaskListView(
                     fontWeight = FontWeight.Medium
                 )
 
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
-            items(filteredTasks) { task ->
-
-                var isMenuExpanded by remember {
-                    mutableStateOf(false)
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 8.dp, vertical = 8.dp
-                        ), colors = cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Row(
-                                modifier = Modifier.weight(1f),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            MaterialTheme.colorScheme.primary
-                                        )
-                                        .clickable {
-
-                                            val updatedTask = task.copy(
-                                                isCompleted = !task.isCompleted
-                                            )
-
-                                            viewModel.addTask(
-                                                updatedTask
-                                            )
-                                        }, contentAlignment = Alignment.Center
-                                ) {
-
-                                    if (!task.isCompleted) {
-
-                                        Box(
-                                            modifier = Modifier
-                                                .size(20.dp)
-                                                .clip(CircleShape)
-                                                .background(
-                                                    MaterialTheme.colorScheme.surface
-                                                )
-                                        )
-                                    }
-                                }
-
-                                Column {
-
-                                    Text(
-                                        text = task.title,
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-
-                                    Spacer(
-                                        modifier = Modifier.height(1.dp)
-                                    )
-
-                                    Text(
-                                        text = task.description,
-                                        fontSize = 14.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-
-                            Box {
-
-                                IconButton(
-                                    onClick = {
-                                        isMenuExpanded = true
-                                    }) {
-
-                                    Icon(
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "Menu to edit/delete",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(30.dp)
-                                    )
-                                }
-
-                                DropdownMenu(
-                                    expanded = isMenuExpanded, onDismissRequest = {
-                                        isMenuExpanded = false
-                                    }) {
-
-                                    DropdownMenuItem(text = {
-                                        Text("Edit")
-                                    }, leadingIcon = {
-
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit Task"
-                                        )
-                                    }, onClick = {
-
-                                        isMenuExpanded = false
-
-                                        navController.navigate(
-                                            "editTask/${task.id}"
-                                        )
-                                    })
-
-                                    DropdownMenuItem(text = {
-                                        Text("Delete")
-                                    }, leadingIcon = {
-
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Delete Task",
-                                            tint = Color.Red
-                                        )
-                                    }, onClick = {
-
-                                        isMenuExpanded = false
-
-                                        viewModel.deleteTask(task)
-                                    })
-                                }
-                            }
-                        }
-                    }
-                }
+            items(
+                items = filteredTasks, key = { task -> task.id ?: task.hashCode() }) { task ->
+                TaskItemRow(task = task, onToggleComplete = {
+                    val updatedTask = task.copy(isCompleted = !task.isCompleted)
+                    viewModel.addTask(updatedTask)
+                }, onEdit = {
+                    navController.navigate("editTask/${task.id}")
+                }, onDelete = {
+                    viewModel.deleteTask(task)
+                })
             }
         }
     }
