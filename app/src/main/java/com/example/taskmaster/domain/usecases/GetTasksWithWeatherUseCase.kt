@@ -17,11 +17,9 @@ class GetTasksWithWeatherUseCase @Inject constructor(
         longitude: Double
     ): Result<TaskWithWeather> = coroutineScope {
         runCatching {
-            // Execute both repository calls concurrently
             val taskDeferred = async { taskRepository.getTaskById(taskId) }
             val weatherDeferred = async { weatherRepository.getWeather(latitude, longitude) }
 
-            // Await both results
             val task = taskDeferred.await()
                 ?: throw NoSuchElementException("Task with ID $taskId not found.")
             val weather = weatherDeferred.await()
