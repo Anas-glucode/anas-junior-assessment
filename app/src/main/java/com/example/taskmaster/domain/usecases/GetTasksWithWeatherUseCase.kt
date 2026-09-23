@@ -1,9 +1,11 @@
 package com.example.taskmaster.domain.usecases
 
-import javax.inject.Inject
 import com.example.taskmaster.domain.models.TaskWithWeather
 import com.example.taskmaster.domain.repos.TaskRepository
 import com.example.taskmaster.domain.repos.WeatherRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import javax.inject.Inject
 
 class GetTasksWithWeatherUseCase @Inject constructor(
     private val taskRepository: TaskRepository,
@@ -13,12 +15,18 @@ class GetTasksWithWeatherUseCase @Inject constructor(
         taskId: Int,
         latitude: Double,
         longitude: Double
-    ): TaskWithWeather? {
+    ): Result<TaskWithWeather> = coroutineScope {
+        runCatching {
+            // Execute both repository calls concurrently
+            val taskDeferred = async { taskRepository.getTaskById(taskId) }
+            val weatherDeferred = async { weatherRepository.getWeather(latitude, longitude) }
 
-        val task = taskRepository.getTaskById(taskId) ?: return null
+            // Await both results
+            val task = taskDeferred.await()
+                ?: throw NoSuchElementException("Task with ID $taskId not found.")
+            val weather = weatherDeferred.await()
 
-        val weather = weatherRepository.getWeather(latitude, longitude)
-
-        return TaskWithWeather(task = task, weather = weather)
+            TaskWithWeather(task = task, weather = weather)
+        }
     }
 }
