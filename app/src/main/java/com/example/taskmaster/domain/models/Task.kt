@@ -3,7 +3,7 @@ package com.example.taskmaster.domain.models
 import com.example.taskmaster.data.local.entities.TaskEntity
 
 data class Task(
-    val id: Int? = null,
+    val id: Int? = 0,
     val title: String,
     val description: String,
     val isCompleted: Boolean
