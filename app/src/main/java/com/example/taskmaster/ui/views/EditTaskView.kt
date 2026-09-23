@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,8 +37,7 @@ import com.example.taskmaster.ui.viewmodels.EditTaskViewModel
 
 @Composable
 fun EditTaskView(
-    navController: NavController,
-    viewModel: EditTaskViewModel = hiltViewModel()
+    navController: NavController, viewModel: EditTaskViewModel = hiltViewModel()
 ) {
     LaunchedEffect(viewModel.taskNotFound) {
         if (viewModel.taskNotFound) {
@@ -46,13 +45,36 @@ fun EditTaskView(
         }
     }
 
+    EditTaskContent(
+        title = viewModel.taskTitle,
+        description = viewModel.taskDescription,
+        onTitleChange = viewModel::onTitleChange,
+        onDescriptionChange = viewModel::onDescriptionChange,
+        onCancel = { navController.popBackStack() },
+        onSave = {
+            viewModel.updateTask {
+                navController.popBackStack()
+            }
+        })
+}
+
+@Composable
+fun EditTaskContent(
+    title: String,
+    description: String,
+    onTitleChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.Start,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 90.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 24.dp)
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -69,25 +91,19 @@ fun EditTaskView(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Cancel Button
                 IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.size(45.dp)
+                    onClick = onCancel, modifier = Modifier.size(45.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel Icon",
+                        contentDescription = "Cancel and dismiss",
                         tint = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.size(30.dp)
                     )
                 }
 
                 Button(
-                    onClick = {
-                        viewModel.updateTask {
-                            navController.popBackStack()
-                        }
-                    },
+                    onClick = onSave,
                     modifier = Modifier.size(45.dp),
                     shape = CircleShape,
                     contentPadding = PaddingValues(0.dp),
@@ -98,7 +114,7 @@ fun EditTaskView(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Save Task Icon",
+                        contentDescription = "Save Task",
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -108,54 +124,37 @@ fun EditTaskView(
         Spacer(modifier = Modifier.height(40.dp))
 
         Text(
-            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Task Name",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp)
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = viewModel.taskTitle,
-            onValueChange = viewModel::onTitleChange,
+            value = title,
+            onValueChange = onTitleChange,
+            singleLine = true,
             shape = RoundedCornerShape(15.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-            )
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp),
             text = "Description",
             fontSize = 20.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(start = 5.dp, bottom = 10.dp)
         )
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = viewModel.taskDescription,
-            onValueChange = viewModel::onDescriptionChange,
+            value = description,
+            onValueChange = onDescriptionChange,
             minLines = 5,
             shape = RoundedCornerShape(15.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-            )
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
