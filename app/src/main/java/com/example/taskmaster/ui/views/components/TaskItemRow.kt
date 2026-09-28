@@ -83,7 +83,10 @@ fun TaskItemRow(
 
                 Column {
                     Text(
-                        text = task.title, fontSize = 22.sp, fontWeight = FontWeight.Medium
+                        text = task.title,
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = task.description,
