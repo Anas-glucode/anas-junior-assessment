@@ -22,24 +22,16 @@ fun AppNavigation() {
         startDestination = "taskList"
     ) {
         composable("taskList") {
-            TaskListView(
-                navController = navController,
-                viewModel = viewModel
-            )
+            TaskListView(navController = navController, viewModel = viewModel)
         }
 
         composable("createTask") {
-            CreateTaskView(
-                navController = navController,
-                viewModel = viewModel
-            )
+            CreateTaskView(navController = navController, viewModel = viewModel)
         }
 
         composable(
             route = "editTask/{taskId}",
-            arguments = listOf(
-                navArgument("taskId") { type = NavType.IntType }
-            )
+            arguments = listOf(navArgument("taskId") { type = NavType.IntType })
         ) {
             EditTaskView(navController = navController)
         }

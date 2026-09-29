@@ -13,12 +13,11 @@ class GetTasksWithWeatherUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         taskId: Int,
-        latitude: Double,
-        longitude: Double
+        query: String = "auto:ip"
     ): Result<TaskWithWeather> = coroutineScope {
         runCatching {
             val taskDeferred = async { taskRepository.getTaskById(taskId) }
-            val weatherDeferred = async { weatherRepository.getWeather(latitude, longitude) }
+            val weatherDeferred = async { weatherRepository.getWeather(query) }
 
             val task = taskDeferred.await()
                 ?: throw NoSuchElementException("Task with ID $taskId not found.")
