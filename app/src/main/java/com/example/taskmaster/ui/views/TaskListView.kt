@@ -30,7 +30,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,10 +58,6 @@ fun TaskListView(
 
     val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchWeather(-26.183, 28.05)
-    }
 
     val tabs = listOf("To Do", "Completed")
     val selectedTabIndex = if (selectedTab == "To Do") 0 else 1
