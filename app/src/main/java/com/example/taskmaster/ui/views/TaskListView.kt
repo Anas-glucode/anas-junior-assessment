@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.taskmaster.ui.mappers.getWeatherBackgroundRes
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
+import com.example.taskmaster.ui.views.components.SearchPill
 import com.example.taskmaster.ui.views.components.TaskItemRow
 import com.example.taskmaster.ui.views.components.WeatherCard
 
@@ -227,99 +228,6 @@ fun TaskListView(
                         bottom = SearchBarVerticalMargin
                     )
             )
-        }
-    }
-}
-
-@Composable
-private fun SearchPill(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val focusManager = LocalFocusManager.current
-    var isFocused by remember { mutableStateOf(false) }
-
-    Surface(
-        modifier = modifier.height(SearchBarHeight),
-        shape = CircleShape,
-        color = Color.White.copy(alpha = 0.95f),
-        shadowElevation = 4.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (isFocused) {
-                IconButton(onClick = {
-                    onQueryChange("")
-                    focusManager.clearFocus()
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.DarkGray
-                    )
-                }
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                        .size(24.dp),
-                    tint = Color.DarkGray
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                if (query.isEmpty()) {
-                    Text(
-                        text = "Search tasks",
-                        color = Color.Gray,
-                        fontSize = 16.sp
-                    )
-                }
-
-                BasicTextField(
-                    value = query,
-                    onValueChange = onQueryChange,
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { isFocused = it.isFocused }
-                )
-            }
-
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear text",
-                        tint = Color.DarkGray
-                    )
-                }
-            }
-
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Default.Mic,
-                    contentDescription = "Voice search",
-                    tint = Color.DarkGray,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
     }
 }
