@@ -5,12 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,150 +21,177 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmaster.R
+import com.example.taskmaster.domain.models.Location
 import com.example.taskmaster.domain.models.Weather
+import java.time.LocalDate
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun WeatherCard(
     weatherState: Weather?,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    val primaryTextColor = Color(0xFF2D2357)
+
+    val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = cardColors(
-            containerColor = Color(0xFF0096FF)
-        )
+            .padding(horizontal = 22.dp, vertical = 7.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
+                .widthIn(max = 280.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(22.dp),
+            colors = cardColors(
+                containerColor = Color.White
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(22.dp),
+                horizontalAlignment = Alignment.Start
             ) {
-                Column {
-                    Text(
-                        text = weatherState?.location?.name ?: "Loading...",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Text(
+                    text = currentDay,
+                    color = primaryTextColor,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.9.sp
+                )
 
+                Text(
+                    text = (weatherState?.condition ?: "Loading...").uppercase(),
+                    color = primaryTextColor,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.45.sp
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = "${weatherState?.location?.country ?: "--"} | ${weatherState?.location?.region ?: "--"}",
-                        color = Color.White.copy(alpha = 0.75f),
-                        fontSize = 16.sp
+                        text = "${weatherState?.tempC?.toInt() ?: 20}°",
+                        color = primaryTextColor,
+                        fontSize = 80.sp,
+                        fontWeight = FontWeight.ExtraBold
                     )
                 }
 
                 Column(
-                    horizontalAlignment = Alignment.End
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 14.dp),
+                    verticalArrangement = Arrangement.spacedBy(7.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = weatherState?.condition ?: "",
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(start = 30.dp)
-                    )
-                }
-            }
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(7.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
+                                contentDescription = "Sunrise Icon",
+                                tint = primaryTextColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(9.dp))
 
-            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = "Sunrise:",
+                                color = primaryTextColor.copy(alpha = 0.8f),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.width(58.dp)
+                            )
+                            Text(
+                                text = weatherState?.sunrise ?: "--:--",
+                                color = primaryTextColor.copy(alpha = 0.8f),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(
-                    text = weatherState?.tempC?.toInt()?.toString() ?: "--",
-                    color = Color.White,
-                    fontSize = 100.sp,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Text(
-                    text = "°C",
-                    color = Color.White,
-                    fontSize = 50.sp,
-                    modifier = Modifier.padding(top = 10.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Column(
-                horizontalAlignment = Alignment.Start
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Sunrise",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.width(75.dp)
-                    )
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
-                        contentDescription = "Sunrise Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-
-                    Text(
-                        text = weatherState?.sunrise ?: "--:--",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
+                                contentDescription = "Sunset Icon",
+                                tint = primaryTextColor,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(9.dp))
+                            Text(
+                                text = "Sunset:",
+                                color = primaryTextColor.copy(alpha = 0.8f),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.width(58.dp)
+                            )
+                            Text(
+                                text = weatherState?.sunset ?: "--:--",
+                                color = primaryTextColor.copy(alpha = 0.8f),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(5.dp))
-
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = "Sunset",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.width(75.dp)
-                    )
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
-                        contentDescription = "Sunset Icon",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-
-                    Text(
-                        text = weatherState?.sunset ?: "--:--",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        modifier = Modifier.padding(start = 12.dp)
+                        text = "${weatherState?.location?.name ?: "--"}, ${weatherState?.location?.country ?: "--"}",
+                        color = primaryTextColor,
+                        fontSize = 13.sp
                     )
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFF0F0F0)
+@Composable
+fun WeatherCardPreview() {
+    val sampleWeather = Weather(
+        location = Location(
+            name = "New York",
+            country = "United States",
+            region = "New York",
+            lat = 40.7128,
+            lon = -74.0060,
+            localtime = "2026-10-05 10:21",
+            localtimeEpoch = 1759650060L
+        ),
+        tempC = 20.0,
+        condition = "Heavy Rain",
+        sunrise = "06:15 AM",
+        sunset = "07:45 PM"
+    )
+
+    WeatherCard(weatherState = sampleWeather)
 }

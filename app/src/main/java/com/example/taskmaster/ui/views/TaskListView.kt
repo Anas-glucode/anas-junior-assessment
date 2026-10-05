@@ -170,7 +170,12 @@ fun TaskListView(
             modifier = Modifier.fillMaxWidth(), contentPadding = innerPadding
         ) {
             item {
+                Spacer(modifier = Modifier.height(50.dp))
+            }
+            item {
                 WeatherCard(weatherState = weatherState)
+
+                Spacer(modifier = Modifier.height(50.dp))
             }
             item {
                 SecondaryTabRow(
