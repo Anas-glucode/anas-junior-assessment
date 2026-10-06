@@ -7,6 +7,7 @@ import com.example.taskmaster.domain.models.Weather
 import com.example.taskmaster.domain.repos.TaskRepository
 import com.example.taskmaster.domain.repos.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -17,11 +18,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import android.util.Log
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
-    private val repository: TaskRepository,
-    private val weatherRepository: WeatherRepository
+    private val repository: TaskRepository, private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
     val tasks: Flow<List<Task>> = repository.getTask()
@@ -32,42 +33,48 @@ class TaskViewModel @Inject constructor(
     private var weatherRefreshJob: Job? = null
 
     init {
-        startWeatherRefreshLoop(-26.2041, 28.0473)
+        startWeatherRefreshLoop()
     }
 
     companion object {
         private const val WEATHER_REFRESH_INTERVAL_MILLIS = 60 * 60 * 1000L
+        private const val AUTO_LOCATION = "auto:ip"
+        private const val HILLBROW = "-26.1907,28.0473"
     }
 
-    fun startWeatherRefreshLoop(latitude: Double, longitude: Double) {
+    private fun startWeatherRefreshLoop() {
         weatherRefreshJob?.cancel()
         weatherRefreshJob = viewModelScope.launch {
             while (isActive) {
-                fetchWeather(latitude, longitude)
+                fetchWeather()
                 delay(WEATHER_REFRESH_INTERVAL_MILLIS.milliseconds)
             }
         }
     }
 
-    fun fetchWeather(latitude: Double, longitude: Double) {
-        viewModelScope.launch {
+    private suspend fun fetchWeather() {
+        _weather.value = try {
+            weatherRepository.getWeather(AUTO_LOCATION)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("Weather", "auto:ip failed", e)
             try {
-                _weather.value = weatherRepository.getWeather(latitude, longitude)
+                weatherRepository.getWeather(HILLBROW)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("Weather", "Hillbrow fallback failed", e)
+                null
             }
         }
     }
 
     fun addTask(task: Task) {
-        viewModelScope.launch {
-            repository.insertTask(task)
-        }
+        viewModelScope.launch { repository.insertTask(task) }
     }
 
     fun deleteTask(task: Task) {
-        viewModelScope.launch {
-            repository.deleteTask(task)
-        }
+        viewModelScope.launch { repository.deleteTask(task) }
     }
 }

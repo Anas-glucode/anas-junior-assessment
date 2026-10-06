@@ -29,6 +29,7 @@ object AppModule {
     @Singleton
     fun provideHttpClient(): HttpClient {
         return HttpClient(CIO) {
+            expectSuccess = true
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
