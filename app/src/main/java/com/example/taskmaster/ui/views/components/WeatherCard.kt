@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,20 +47,19 @@ fun WeatherCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Bottom
         ) {
-            // Flattened: Temperature and Condition texts sit directly in the parent Row
             Column {
                 Text(
                     text = "${weatherState?.tempC?.toInt() ?: 20}°",
                     color = primaryTextColor,
-                    fontSize = 72.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 90.sp,
+                    fontWeight = FontWeight.Bold,
                     lineHeight = 72.sp
                 )
 
                 Text(
                     text = (weatherState?.condition ?: "Loading...").uppercase(),
                     color = primaryTextColor.copy(alpha = 0.9f),
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 0.5.sp
                 )
@@ -69,16 +67,15 @@ fun WeatherCard(
 
             Text(
                 text = currentDay,
-                color = primaryTextColor.copy(alpha = 0.8f),
-                fontSize = 16.sp,
+                color = primaryTextColor.copy(alpha = 0.9f),
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 0.8.sp
+                letterSpacing = 0.5.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        // Flattened: Sunrise and Sunset items placed directly inside the main horizontal Row layout
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -88,12 +85,12 @@ fun WeatherCard(
                 painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
                 contentDescription = "Sunrise Icon",
                 tint = primaryTextColor,
-                modifier = Modifier.size(15.dp)
+                modifier = Modifier.size(18.dp)
             )
             Text(
                 text = weatherState?.sunrise ?: "--:--",
                 color = primaryTextColor.copy(alpha = 0.8f),
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
 
@@ -101,12 +98,12 @@ fun WeatherCard(
                 painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
                 contentDescription = "Sunset Icon",
                 tint = primaryTextColor,
-                modifier = Modifier.size(15.dp)
+                modifier = Modifier.size(20.dp)
             )
             Text(
                 text = weatherState?.sunset ?: "--:--",
                 color = primaryTextColor.copy(alpha = 0.8f),
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -115,8 +112,8 @@ fun WeatherCard(
 
         Text(
             text = "${weatherState?.location?.name ?: "--"}, ${weatherState?.location?.country ?: "--"}".uppercase(),
-            color = primaryTextColor.copy(alpha = 0.7f),
-            fontSize = 11.sp,
+            color = primaryTextColor.copy(alpha = 0.9f),
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.8.sp
         )

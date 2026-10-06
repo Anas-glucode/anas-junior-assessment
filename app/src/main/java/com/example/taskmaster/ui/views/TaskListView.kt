@@ -37,6 +37,7 @@ import com.example.taskmaster.ui.views.components.SearchPillHeight
 import com.example.taskmaster.ui.views.components.TaskItemRow
 import com.example.taskmaster.ui.views.components.TaskTabRow
 import com.example.taskmaster.ui.views.components.WeatherCard
+import com.example.taskmaster.ui.views.components.WeatherCardSkeleton
 import com.example.taskmaster.ui.views.components.WeatherHeader
 
 private val SearchBarVerticalMargin = 8.dp
@@ -81,8 +82,12 @@ fun TaskListView(
                 )
             ) {
                 item {
-                    WeatherHeader(backgroundRes = weatherState.getWeatherBackgroundRes()) {
-                        WeatherCard(weatherState = weatherState)
+                    WeatherHeader(backgroundRes = weatherState?.getWeatherBackgroundRes() ?: com.example.taskmaster.R.drawable.sunny_weather_background) {
+                        if (weatherState == null) {
+                            WeatherCardSkeleton()
+                        } else {
+                            WeatherCard(weatherState = weatherState)
+                        }
                     }
                 }
 
@@ -93,7 +98,9 @@ fun TaskListView(
                         selectedTabIndex = selectedTabIndex,
                         onTabSelected = { selectedTabIndex = it }
                     )
+
                     Spacer(Modifier.height(10.dp))
+
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = "Tasks",
@@ -101,6 +108,7 @@ fun TaskListView(
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Medium
                     )
+
                     Spacer(Modifier.height(10.dp))
                 }
 
