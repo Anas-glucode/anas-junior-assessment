@@ -1,5 +1,6 @@
 package com.example.taskmaster.ui.views.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +37,8 @@ fun WeatherCard(
     weatherState: Weather?,
     modifier: Modifier = Modifier
 ) {
-    val primaryTextColor = Color(0xFF2D2357)
+    val primaryTextColor = Color(0xFFFFFFFF)
+    val containerColor = Color(0xFF8E989B)
 
     val currentDay = LocalDate.now().dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()
 
@@ -50,30 +52,31 @@ fun WeatherCard(
             modifier = Modifier
                 .widthIn(max = 280.dp)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(22.dp),
+            shape = RoundedCornerShape(40.dp), // Softer, rounded glass card shape
             colors = cardColors(
-                containerColor = Color.White
+                containerColor = containerColor.copy(alpha = 0.30f)
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(22.dp),
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = currentDay,
                     color = primaryTextColor,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.9.sp
                 )
 
                 Text(
                     text = (weatherState?.condition ?: "Loading...").uppercase(),
-                    color = primaryTextColor,
-                    fontSize = 14.sp,
+                    color = primaryTextColor.copy(alpha = 0.8f),
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 0.45.sp
                 )
@@ -81,13 +84,13 @@ fun WeatherCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 14.dp),
+                        .padding(vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "${weatherState?.tempC?.toInt() ?: 20}°",
                         color = primaryTextColor,
-                        fontSize = 80.sp,
+                        fontSize = 72.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
                 }
@@ -95,12 +98,12 @@ fun WeatherCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 14.dp),
-                    verticalArrangement = Arrangement.spacedBy(7.dp),
+                        .padding(bottom = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
                         horizontalAlignment = Alignment.Start
                     ) {
                         Row(
@@ -111,21 +114,21 @@ fun WeatherCard(
                                 painter = painterResource(id = R.drawable.sunrise_svgrepo_com),
                                 contentDescription = "Sunrise Icon",
                                 tint = primaryTextColor,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(9.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
 
                             Text(
                                 text = "Sunrise:",
-                                color = primaryTextColor.copy(alpha = 0.8f),
-                                fontSize = 13.sp,
+                                color = primaryTextColor.copy(alpha = 0.75f),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                modifier = Modifier.width(58.dp)
+                                modifier = Modifier.width(54.dp)
                             )
                             Text(
                                 text = weatherState?.sunrise ?: "--:--",
-                                color = primaryTextColor.copy(alpha = 0.8f),
-                                fontSize = 13.sp,
+                                color = primaryTextColor.copy(alpha = 0.75f),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -138,20 +141,20 @@ fun WeatherCard(
                                 painter = painterResource(id = R.drawable.sunset_down_svgrepo_com),
                                 contentDescription = "Sunset Icon",
                                 tint = primaryTextColor,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(16.dp)
                             )
-                            Spacer(modifier = Modifier.width(9.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Sunset:",
-                                color = primaryTextColor.copy(alpha = 0.8f),
-                                fontSize = 13.sp,
+                                color = primaryTextColor.copy(alpha = 0.75f),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                modifier = Modifier.width(58.dp)
+                                modifier = Modifier.width(54.dp)
                             )
                             Text(
                                 text = weatherState?.sunset ?: "--:--",
-                                color = primaryTextColor.copy(alpha = 0.8f),
-                                fontSize = 13.sp,
+                                color = primaryTextColor.copy(alpha = 0.75f),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -165,8 +168,9 @@ fun WeatherCard(
                 ) {
                     Text(
                         text = "${weatherState?.location?.name ?: "--"}, ${weatherState?.location?.country ?: "--"}",
-                        color = primaryTextColor,
-                        fontSize = 13.sp
+                        color = primaryTextColor.copy(alpha = 0.9f),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }
@@ -174,7 +178,7 @@ fun WeatherCard(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFF0F0F0)
+@Preview(showBackground = true, backgroundColor = 0xFF87CEEB)
 @Composable
 fun WeatherCardPreview() {
     val sampleWeather = Weather(

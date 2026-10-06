@@ -25,9 +25,9 @@ fun WeatherHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .height(440.dp)
-            .clip(RoundedCornerShape(32.dp))
+            .padding(horizontal = 16.dp, vertical = 2.dp)
+            .height(450.dp)
+            .clip(RoundedCornerShape(30.dp))
     ) {
         Image(
             painter = painterResource(id = backgroundRes),
@@ -39,7 +39,7 @@ fun WeatherHeader(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(5.dp),
             contentAlignment = Alignment.Center
         ) {
             content()
