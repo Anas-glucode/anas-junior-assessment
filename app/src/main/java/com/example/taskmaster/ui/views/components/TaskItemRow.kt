@@ -1,5 +1,10 @@
 package com.example.taskmaster.ui.views.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +19,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +48,7 @@ fun TaskItemRow(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isMenuExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -96,32 +100,65 @@ fun TaskItemRow(
                 }
             }
 
-            Box {
-                IconButton(onClick = { isMenuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert, contentDescription = "Menu"
-                    )
+            // Expressive Slide-out Action Group
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = fadeOut() + slideOutHorizontally(targetOffsetX = { it })
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Edit Action Pill (Matched with Secondary Container)
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            IconButton(onClick = {
+                                isExpanded = false
+                                onEdit()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        // Delete Action Pill (Matched with Error Container)
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            IconButton(onClick = {
+                                isExpanded = false
+                                onDelete()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
                 }
-                DropdownMenu(
-                    expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
-                    DropdownMenuItem(text = { Text("Edit") }, leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Edit, contentDescription = "Edit"
-                        )
-                    }, onClick = {
-                        isMenuExpanded = false
-                        onEdit()
-                    })
-                    DropdownMenuItem(text = { Text("Delete") }, leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red
-                        )
-                    }, onClick = {
-                        isMenuExpanded = false
-                        onDelete()
-                    })
+
+                // Trigger Button (Plain IconButton without background circle)
+                IconButton(onClick = { isExpanded = !isExpanded }) {
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.MoreVert,
+                        contentDescription = "Toggle Actions",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
