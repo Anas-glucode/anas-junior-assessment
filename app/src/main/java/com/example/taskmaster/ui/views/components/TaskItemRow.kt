@@ -1,6 +1,12 @@
 package com.example.taskmaster.ui.views.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,16 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,11 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmaster.domain.models.Task
+import com.example.taskmaster.ui.theme.LocalWeatherAccent
 
 @Composable
 fun TaskItemRow(
@@ -44,7 +50,8 @@ fun TaskItemRow(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isMenuExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
+    val accent = LocalWeatherAccent.current
 
     Card(
         modifier = modifier
@@ -64,22 +71,20 @@ fun TaskItemRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Completed: solid gradient fill. Not completed: gradient ring, empty inside.
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clickable { onToggleComplete() }, contentAlignment = Alignment.Center
-                ) {
-                    if (!task.isCompleted) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface)
+                        .then(
+                            if (task.isCompleted) {
+                                Modifier.background(accent.brush)
+                            } else {
+                                Modifier.border(width = 2.dp, brush = accent.brush, shape = CircleShape)
+                            }
                         )
-                    }
-                }
+                        .clickable { onToggleComplete() }
+                )
 
                 Column {
                     Text(
@@ -96,32 +101,62 @@ fun TaskItemRow(
                 }
             }
 
-            Box {
-                IconButton(onClick = { isMenuExpanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert, contentDescription = "Menu"
-                    )
+            // Action group slider
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = fadeOut() + slideOutHorizontally(targetOffsetX = { it })
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            IconButton(onClick = {
+                                isExpanded = false
+                                onEdit()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            IconButton(onClick = {
+                                isExpanded = false
+                                onDelete()
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
                 }
-                DropdownMenu(
-                    expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
-                    DropdownMenuItem(text = { Text("Edit") }, leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Edit, contentDescription = "Edit"
-                        )
-                    }, onClick = {
-                        isMenuExpanded = false
-                        onEdit()
-                    })
-                    DropdownMenuItem(text = { Text("Delete") }, leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
-                            tint = Color.Red
-                        )
-                    }, onClick = {
-                        isMenuExpanded = false
-                        onDelete()
-                    })
+
+                IconButton(onClick = { isExpanded = !isExpanded }) {
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.MoreVert,
+                        contentDescription = "Toggle Actions",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

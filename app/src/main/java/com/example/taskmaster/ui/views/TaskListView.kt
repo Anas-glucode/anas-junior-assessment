@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -24,16 +27,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.example.taskmaster.ui.mappers.getWeatherBackgroundRes
+import com.example.taskmaster.domain.models.Task
+import com.example.taskmaster.ui.theme.LocalWeatherAccent
+import com.example.taskmaster.ui.theme.WeatherType
+import com.example.taskmaster.ui.theme.toAccent
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
 import com.example.taskmaster.ui.views.components.AddTaskFab
 import com.example.taskmaster.ui.views.components.SearchPill
 import com.example.taskmaster.ui.views.components.SearchPillHeight
+import com.example.taskmaster.ui.views.components.TaskBottomSheet
 import com.example.taskmaster.ui.views.components.TaskItemRow
 import com.example.taskmaster.ui.views.components.TaskTabRow
 import com.example.taskmaster.ui.views.components.WeatherCard
@@ -43,16 +48,23 @@ import com.example.taskmaster.ui.views.components.WeatherHeader
 private val SearchBarVerticalMargin = 8.dp
 private val Tabs = listOf("To Do", "Completed")
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListView(
-    navController: NavController,
     viewModel: TaskViewModel
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
 
+    var activeTaskToEdit by remember { mutableStateOf<Task?>(null) }
+    var isSheetVisible by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
+
+    val weatherType = WeatherType.from(weatherState)
+    val accent = remember(weatherType) { weatherType.toAccent() }
 
     val showCompleted = selectedTabIndex == 1
     val filteredTasks = tasks.filter { task ->
@@ -64,82 +76,119 @@ fun TaskListView(
     }
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    val listTopPadding = statusBarTop + SearchPillHeight + SearchBarVerticalMargin * 2
+    val listTopPadding = statusBarTop + SearchPillHeight + SearchBarVerticalMargin
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent,
-        floatingActionButton = {
-            AddTaskFab(onClick = { navController.navigate("createTask") })
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
-                    top = listTopPadding,
-                    bottom = innerPadding.calculateBottomPadding()
-                )
-            ) {
-                item {
-                    WeatherHeader(backgroundRes = weatherState?.getWeatherBackgroundRes() ?: com.example.taskmaster.R.drawable.sunny_weather_background) {
-                        if (weatherState == null) {
-                            WeatherCardSkeleton()
-                        } else {
-                            WeatherCard(weatherState = weatherState)
+    CompositionLocalProvider(LocalWeatherAccent provides accent) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            // Plain black (dark) or white (light) page, driven by the theme
+            containerColor = MaterialTheme.colorScheme.background,
+            floatingActionButton = {
+                AddTaskFab(onClick = {
+                    activeTaskToEdit = null
+                    isSheetVisible = true
+                })
+            }
+        ) { innerPadding ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = listTopPadding,
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+                ) {
+                    item {
+                        WeatherHeader(backgroundRes = weatherType.backgroundRes) {
+                            if (weatherState == null) {
+                                WeatherCardSkeleton()
+                            } else {
+                                WeatherCard(weatherState = weatherState)
+                            }
                         }
+                    }
+
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        TaskTabRow(
+                            tabs = Tabs,
+                            selectedTabIndex = selectedTabIndex,
+                            onTabSelected = { selectedTabIndex = it }
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = "Tasks",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Spacer(Modifier.height(10.dp))
+                    }
+
+                    items(
+                        items = filteredTasks,
+                        key = { task -> task.id ?: task.hashCode() }
+                    ) { task ->
+                        TaskItemRow(
+                            task = task,
+                            onToggleComplete = {
+                                viewModel.addTask(task.copy(isCompleted = !task.isCompleted))
+                            },
+                            onEdit = {
+                                activeTaskToEdit = task
+                                isSheetVisible = true
+                            },
+                            onDelete = { viewModel.deleteTask(task) }
+                        )
                     }
                 }
 
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    TaskTabRow(
-                        tabs = Tabs,
-                        selectedTabIndex = selectedTabIndex,
-                        onTabSelected = { selectedTabIndex = it }
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "Tasks",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-                }
-
-                items(
-                    items = filteredTasks,
-                    key = { task -> task.id ?: task.hashCode() }
-                ) { task ->
-                    TaskItemRow(
-                        task = task,
-                        onToggleComplete = {
-                            viewModel.addTask(task.copy(isCompleted = !task.isCompleted))
-                        },
-                        onEdit = { navController.navigate("editTask/${task.id}") },
-                        onDelete = { viewModel.deleteTask(task) }
-                    )
-                }
+                SearchPill(
+                    query = searchQuery,
+                    onQueryChange = { searchQuery = it },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = statusBarTop + SearchBarVerticalMargin,
+                            bottom = SearchBarVerticalMargin
+                        )
+                )
             }
 
-            SearchPill(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .fillMaxWidth()
-                    .padding(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = statusBarTop + SearchBarVerticalMargin,
-                        bottom = SearchBarVerticalMargin
-                    )
-            )
+            if (isSheetVisible) {
+                TaskBottomSheet(
+                    taskToEdit = activeTaskToEdit,
+                    sheetState = sheetState,
+                    onDismiss = { isSheetVisible = false },
+                    onSave = { title, description ->
+                        val editing = activeTaskToEdit
+                        if (editing != null) {
+                            viewModel.addTask(
+                                editing.copy(
+                                    title = title.trim(),
+                                    description = description.trim()
+                                )
+                            )
+                        } else {
+                            viewModel.addTask(
+                                Task(
+                                    title = title.trim(),
+                                    description = description.trim(),
+                                    isCompleted = false
+                                )
+                            )
+                        }
+                        isSheetVisible = false
+                    }
+                )
+            }
         }
     }
 }

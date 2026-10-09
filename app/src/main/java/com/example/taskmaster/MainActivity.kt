@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.taskmaster.ui.navigation.AppNavigation
+import com.example.taskmaster.ui.views.navigation.AppNavigation
 import com.example.taskmaster.ui.theme.TaskMasterTheme
 import dagger.hilt.android.AndroidEntryPoint
 

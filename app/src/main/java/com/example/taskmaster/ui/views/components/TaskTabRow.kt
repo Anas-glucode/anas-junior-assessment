@@ -8,13 +8,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.taskmaster.ui.theme.LocalWeatherAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +27,9 @@ fun TaskTabRow(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val accent = LocalWeatherAccent.current
+    val unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+
     SecondaryTabRow(
         selectedTabIndex = selectedTabIndex,
         modifier = modifier
@@ -31,13 +37,11 @@ fun TaskTabRow(
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(8.dp)),
         containerColor = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        contentColor = unselectedColor,
         indicator = {
             TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(
-                    selectedTabIndex, matchContentSize = false
-                ),
-                color = MaterialTheme.colorScheme.primary
+                modifier = Modifier.tabIndicatorOffset(selectedTabIndex, matchContentSize = false),
+                color = accent.color
             )
         },
         divider = {}
@@ -50,10 +54,20 @@ fun TaskTabRow(
                 text = {
                     Text(
                         text = title,
-                        fontSize = 16.sp,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                        color = if (isSelected) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
+                        style = if (isSelected) {
+                            // Gradient text for the selected tab
+                            TextStyle(
+                                brush = accent.brush,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        } else {
+                            TextStyle(
+                                color = unselectedColor,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Normal
+                            )
+                        }
                     )
                 }
             )
