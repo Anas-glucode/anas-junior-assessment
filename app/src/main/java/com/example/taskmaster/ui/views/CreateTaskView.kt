@@ -5,24 +5,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,26 +40,43 @@ import androidx.navigation.NavController
 import com.example.taskmaster.domain.models.Task
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateTaskView(
-    navController: NavController, viewModel: TaskViewModel
+    navController: NavController,
+    viewModel: TaskViewModel
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
-    CreateTaskContent(
-        title = title,
-        description = description,
-        onTitleChange = { title = it },
-        onDescriptionChange = { description = it },
-        onCancel = { navController.popBackStack() },
-        onSave = {
-            val newTask = Task(
-                title = title.trim(), description = description.trim(), isCompleted = false
-            )
-            viewModel.addTask(newTask)
-            navController.popBackStack()
-        })
+    // Sheet state to handle the bottom sheet visibility smoothly
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = { navController.popBackStack() },
+        sheetState = sheetState,
+        // Material 3 Expressive style: heavily rounded top corners
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        CreateTaskContent(
+            title = title,
+            description = description,
+            onTitleChange = { title = it },
+            onDescriptionChange = { description = it },
+            onCancel = { navController.popBackStack() },
+            onSave = {
+                val newTask = Task(
+                    title = title.trim(),
+                    description = description.trim(),
+                    isCompleted = false
+                )
+                viewModel.addTask(newTask)
+                navController.popBackStack()
+            },
+            modifier = Modifier.padding(bottom = 32.dp) // Bottom padding for navigation bar spacing
+        )
+    }
 }
 
 @Composable
@@ -73,18 +92,18 @@ fun CreateTaskContent(
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // M3 Expressive style uses prominent typography and friendly scales
             Text(
                 text = "Create Task",
-                fontSize = 35.sp,
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -95,7 +114,8 @@ fun CreateTaskContent(
             ) {
                 // Cancel Button
                 IconButton(
-                    onClick = onCancel, modifier = Modifier.size(45.dp)
+                    onClick = onCancel,
+                    modifier = Modifier.size(45.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -105,7 +125,7 @@ fun CreateTaskContent(
                     )
                 }
 
-                // Save Button
+                // Save Button (Expressive pill/circle design)
                 Button(
                     onClick = onSave,
                     enabled = title.isNotBlank(),
@@ -126,11 +146,11 @@ fun CreateTaskContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             text = "Task Name",
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp)
@@ -140,7 +160,7 @@ fun CreateTaskContent(
             value = title,
             onValueChange = onTitleChange,
             singleLine = true,
-            shape = RoundedCornerShape(15.dp),
+            shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -148,7 +168,7 @@ fun CreateTaskContent(
 
         Text(
             text = "Description",
-            fontSize = 20.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(start = 5.dp, bottom = 10.dp)
@@ -157,8 +177,8 @@ fun CreateTaskContent(
         OutlinedTextField(
             value = description,
             onValueChange = onDescriptionChange,
-            minLines = 5,
-            shape = RoundedCornerShape(15.dp),
+            minLines = 4,
+            shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         )
     }

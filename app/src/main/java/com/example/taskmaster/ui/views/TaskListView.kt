@@ -12,9 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.taskmaster.domain.models.Task
 import com.example.taskmaster.ui.mappers.getWeatherBackgroundRes
 import com.example.taskmaster.ui.viewmodels.TaskViewModel
 import com.example.taskmaster.ui.views.components.AddTaskFab
@@ -43,6 +49,7 @@ import com.example.taskmaster.ui.views.components.WeatherHeader
 private val SearchBarVerticalMargin = 8.dp
 private val Tabs = listOf("To Do", "Completed")
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListView(
     navController: NavController,
@@ -50,6 +57,10 @@ fun TaskListView(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    // State to toggle the Bottom Sheet locally on the list view
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val weatherState by viewModel.weather.collectAsState()
     val tasks by viewModel.tasks.collectAsState(initial = emptyList())
@@ -64,13 +75,14 @@ fun TaskListView(
     }
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    val listTopPadding = statusBarTop + SearchPillHeight + SearchBarVerticalMargin * 2
+    val listTopPadding = statusBarTop + SearchPillHeight + SearchBarVerticalMargin
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent,
         floatingActionButton = {
-            AddTaskFab(onClick = { navController.navigate("createTask") })
+            // Trigger the bottom sheet instead of navigating
+            AddTaskFab(onClick = { showBottomSheet = true })
         }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -140,6 +152,37 @@ fun TaskListView(
                         bottom = SearchBarVerticalMargin
                     )
             )
+        }
+
+        // Bottom Sheet pops up directly over the Task List View when toggled
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                sheetState = sheetState,
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                dragHandle = { BottomSheetDefaults.DragHandle() }
+            ) {
+                var title by remember { mutableStateOf("") }
+                var description by remember { mutableStateOf("") }
+
+                CreateTaskContent(
+                    title = title,
+                    description = description,
+                    onTitleChange = { title = it },
+                    onDescriptionChange = { description = it },
+                    onCancel = { showBottomSheet = false },
+                    onSave = {
+                        val newTask = Task(
+                            title = title.trim(),
+                            description = description.trim(),
+                            isCompleted = false
+                        )
+                        viewModel.addTask(newTask)
+                        showBottomSheet = false
+                    },
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
+            }
         }
     }
 }
