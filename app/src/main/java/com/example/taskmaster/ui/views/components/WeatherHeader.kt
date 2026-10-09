@@ -2,6 +2,7 @@ package com.example.taskmaster.ui.views.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 fun WeatherHeader(
     @DrawableRes backgroundRes: Int,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -28,6 +30,7 @@ fun WeatherHeader(
             .padding(horizontal = 16.dp, vertical = 2.dp)
             .height(450.dp)
             .clip(RoundedCornerShape(30.dp))
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
     ) {
         Image(
             painter = painterResource(id = backgroundRes),
