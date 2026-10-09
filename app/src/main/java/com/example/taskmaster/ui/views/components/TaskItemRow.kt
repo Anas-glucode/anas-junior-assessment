@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,10 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.taskmaster.domain.models.Task
+import com.example.taskmaster.ui.theme.LocalWeatherAccent
 
 @Composable
 fun TaskItemRow(
@@ -49,6 +51,7 @@ fun TaskItemRow(
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val accent = LocalWeatherAccent.current
 
     Card(
         modifier = modifier
@@ -68,22 +71,20 @@ fun TaskItemRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Completed: solid gradient fill. Not completed: gradient ring, empty inside.
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                        .clickable { onToggleComplete() }, contentAlignment = Alignment.Center
-                ) {
-                    if (!task.isCompleted) {
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surface)
+                        .then(
+                            if (task.isCompleted) {
+                                Modifier.background(accent.brush)
+                            } else {
+                                Modifier.border(width = 2.dp, brush = accent.brush, shape = CircleShape)
+                            }
                         )
-                    }
-                }
+                        .clickable { onToggleComplete() }
+                )
 
                 Column {
                     Text(
@@ -100,7 +101,7 @@ fun TaskItemRow(
                 }
             }
 
-            // Expressive Slide-out Action Group
+            // Action group slider
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -114,7 +115,6 @@ fun TaskItemRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Edit Action Pill (Matched with Secondary Container)
                         Surface(
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.secondaryContainer,
@@ -132,7 +132,6 @@ fun TaskItemRow(
                             }
                         }
 
-                        // Delete Action Pill (Matched with Error Container)
                         Surface(
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.errorContainer,
@@ -152,7 +151,6 @@ fun TaskItemRow(
                     }
                 }
 
-                // Trigger Button (Plain IconButton without background circle)
                 IconButton(onClick = { isExpanded = !isExpanded }) {
                     Icon(
                         imageVector = if (isExpanded) Icons.Default.Close else Icons.Default.MoreVert,
