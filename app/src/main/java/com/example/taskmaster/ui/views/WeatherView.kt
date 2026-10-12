@@ -37,12 +37,13 @@ import com.example.taskmaster.domain.models.Weather
 import com.example.taskmaster.ui.theme.LocalWeatherAccent
 import com.example.taskmaster.ui.theme.WeatherType
 import com.example.taskmaster.ui.theme.toAccent
-import com.example.taskmaster.ui.views.components.HumidityTile
-import com.example.taskmaster.ui.views.components.SevenDayTile
-import com.example.taskmaster.ui.views.components.SunTile
-import com.example.taskmaster.ui.views.components.UvTile
+import com.example.taskmaster.ui.views.components.weatherTiles.GlassTile
+import com.example.taskmaster.ui.views.components.weatherTiles.SevenDayTile
+import com.example.taskmaster.ui.views.components.weatherTiles.SunTile
+import com.example.taskmaster.ui.views.components.weatherTiles.UvTile
 import com.example.taskmaster.ui.views.components.WeatherCard
-import com.example.taskmaster.ui.views.components.WindTiles
+import com.example.taskmaster.ui.views.components.weatherTiles.HumidityTile
+import com.example.taskmaster.ui.views.components.weatherTiles.WindTiles
 
 @Composable
 fun WeatherView(
