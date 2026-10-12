@@ -119,25 +119,3 @@ fun WeatherCard(
         )
     }
 }
-
-@Preview(showBackground = true, backgroundColor = 0xFF4A90E2)
-@Composable
-fun WeatherCardPreview() {
-    val sampleWeather = Weather(
-        location = Location(
-            name = "London",
-            country = "United Kingdom",
-            region = "London",
-            lat = 51.5074,
-            lon = -0.1278,
-            localtime = "2026-10-06 10:21",
-            localtimeEpoch = 1759650060L
-        ),
-        tempC = 3.0,
-        condition = "Rainy",
-        sunrise = "06:15 AM",
-        sunset = "07:45 PM"
-    )
-
-    WeatherCard(weatherState = sampleWeather)
-}

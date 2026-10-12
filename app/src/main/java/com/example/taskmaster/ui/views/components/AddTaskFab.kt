@@ -22,7 +22,7 @@ fun AddTaskFab(onClick: () -> Unit, modifier: Modifier = Modifier) {
     FloatingActionButton(
         onClick = onClick,
         modifier = modifier
-            .shadow(elevation = 6.dp, shape = shape)
+            .shadow(elevation = 2.dp, shape = shape)
             .background(brush = accent.brush, shape = shape),
         shape = shape,
         containerColor = Color.Transparent,
