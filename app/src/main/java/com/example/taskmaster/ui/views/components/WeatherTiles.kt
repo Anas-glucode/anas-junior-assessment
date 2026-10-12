@@ -1,6 +1,5 @@
 package com.example.taskmaster.ui.views.components
 
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +50,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.taskmaster.R
 import com.example.taskmaster.domain.models.DailyForecast
 import com.example.taskmaster.ui.theme.LocalWeatherAccent
 import kotlinx.coroutines.delay
@@ -152,19 +148,11 @@ fun UvTile(
 ) {
     val level = uv.coerceAtLeast(0.0).roundToInt()
 
-    val uvColor = when {
-        level <= 2 -> Color(0xFF72E6A6)      // Low: green
-        level <= 5 -> Color(0xFFFFD166)      // Moderate: yellow
-        level <= 7 -> Color(0xFFFFA45B)      // High: orange
-        level <= 10 -> Color(0xFFFF6B6B)     // Very high: red
-        else -> Color(0xFFCB9BFF)            // Extreme: purple
-    }
-
     GlassTile(title = "UV Index", modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 1.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -175,7 +163,7 @@ fun UvTile(
                 CircularUvBar(
                     percentage = (uv.coerceAtLeast(0.0) / 11.0).toFloat(),
                     modifier = Modifier.fillMaxSize(),
-                    progressColor = uvColor,
+                    progressColor = Color.White, // Set progress color to white
                     trackColor = Color.White.copy(alpha = 0.16f),
                     strokeWidth = 7.dp
                 )
@@ -206,8 +194,6 @@ fun UvTile(
                 }
             }
 
-            Spacer(Modifier.height(10.dp))
-
             Text(
                 text = uvAdvice(level),
                 color = White70,
@@ -228,7 +214,7 @@ private fun CircularUvBar(
 ) {
     Canvas(modifier = modifier) {
         val stroke = strokeWidth.toPx()
-        val diameter = size.minDimension - stroke
+        val diameter = (size.minDimension - stroke) * 0.8f
 
         val arcSize = Size(diameter, diameter)
 
@@ -295,7 +281,7 @@ fun HumidityTile(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 1.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -319,7 +305,7 @@ fun HumidityTile(
                     Text(
                         text = "$humidity%",
                         color = Color.White,
-                        fontSize = 34.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold
                     )
 
@@ -333,9 +319,6 @@ fun HumidityTile(
                     )
                 }
             }
-
-            Spacer(Modifier.height(10.dp))
-
             Text(
                 text = description,
                 color = White70,
@@ -356,7 +339,8 @@ private fun CircularHumidityBar(
 ) {
     Canvas(modifier = modifier) {
         val stroke = strokeWidth.toPx()
-        val diameter = size.minDimension - stroke
+        val diameter = (size.minDimension - stroke) * 0.8f
+
         val arcSize = Size(diameter, diameter)
 
         val topLeft = Offset(

@@ -21,28 +21,27 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.taskmaster.domain.models.Weather
+import com.example.taskmaster.ui.theme.WeatherType
+import com.example.taskmaster.ui.theme.toAccent
 import com.example.taskmaster.ui.views.components.HumidityTile
 import com.example.taskmaster.ui.views.components.SevenDayTile
 import com.example.taskmaster.ui.views.components.SunTile
 import com.example.taskmaster.ui.views.components.UvTile
 import com.example.taskmaster.ui.views.components.WeatherCard
 import com.example.taskmaster.ui.views.components.WindTiles
-import org.w3c.dom.Text
 
 @Composable
 fun WeatherView(
@@ -50,12 +49,21 @@ fun WeatherView(
     @DrawableRes backgroundRes: Int,
     onDismiss: () -> Unit
 ) {
+    // Get the gradient associated with the current weather condition.
+    val weatherType = remember(weather.condition) {
+        WeatherType.from(weather)
+    }
+
+    val weatherAccent = weatherType.toAccent()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background) // plain white / black page
+            .background(MaterialTheme.colorScheme.background)
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
+                interactionSource = remember {
+                    MutableInteractionSource()
+                },
                 indication = null,
                 onClick = {}
             )
@@ -66,10 +74,9 @@ fun WeatherView(
                 .verticalScroll(rememberScrollState())
                 .statusBarsPadding()
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
-            // Header: same size and card as the task list screen
+            // Weather header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,15 +86,30 @@ fun WeatherView(
                 Image(
                     painter = painterResource(id = backgroundRes),
                     contentDescription = null,
-                    modifier = Modifier.matchParentSize(),
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
+
                 WeatherCard(weatherState = weather)
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Focused View title with the dynamic weather gradient.
+            Text(
+                text = "Focused View",
+                style = TextStyle(
+                    brush = weatherAccent.brush,
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                modifier = Modifier.padding(start = 10.dp)
+            )
+
+            // Seven-day forecast
             SevenDayTile(daily = weather.daily)
 
-            // Two half tiles
+            // UV and humidity
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -100,6 +122,7 @@ fun WeatherView(
                         .weight(1f)
                         .fillMaxHeight()
                 )
+
                 HumidityTile(
                     humidity = weather.humidity,
                     modifier = Modifier
@@ -108,10 +131,13 @@ fun WeatherView(
                 )
             }
 
-            // Full-width sun arc
-            SunTile(sunrise = weather.sunrise, sunset = weather.sunset)
+            // Sunrise and sunset
+            SunTile(
+                sunrise = weather.sunrise,
+                sunset = weather.sunset
+            )
 
-            // Three small tiles: speed, gusts, direction
+            // Wind speed, gusts and direction
             WindTiles(
                 speedKph = weather.windKph,
                 gustKph = weather.gustKph,
@@ -119,9 +145,11 @@ fun WeatherView(
                 directionLabel = weather.windDir
             )
 
-            // Forecast
-
-            Spacer(Modifier.navigationBarsPadding().height(30.dp))
+            Spacer(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .height(30.dp)
+            )
         }
     }
 }
