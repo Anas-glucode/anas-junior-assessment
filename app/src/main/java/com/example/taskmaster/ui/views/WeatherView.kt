@@ -37,7 +37,6 @@ import com.example.taskmaster.domain.models.Weather
 import com.example.taskmaster.ui.theme.LocalWeatherAccent
 import com.example.taskmaster.ui.theme.WeatherType
 import com.example.taskmaster.ui.theme.toAccent
-import com.example.taskmaster.ui.views.components.weatherTiles.GlassTile
 import com.example.taskmaster.ui.views.components.weatherTiles.SevenDayTile
 import com.example.taskmaster.ui.views.components.weatherTiles.SunTile
 import com.example.taskmaster.ui.views.components.weatherTiles.UvTile
@@ -51,7 +50,6 @@ fun WeatherView(
     @DrawableRes backgroundRes: Int,
     onDismiss: () -> Unit
 ) {
-    // Get the accent for the current weather condition.
     val weatherAccent = remember(weather.condition) {
         WeatherType.from(weather).toAccent()
     }
@@ -98,7 +96,6 @@ fun WeatherView(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Focused View with the dynamic weather gradient.
                 Text(
                     text = "Focused View",
                     style = TextStyle(
@@ -109,10 +106,8 @@ fun WeatherView(
                     modifier = Modifier.padding(start = 10.dp)
                 )
 
-                // Seven-day forecast
                 SevenDayTile(daily = weather.daily)
 
-                // UV and humidity
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,13 +129,11 @@ fun WeatherView(
                     )
                 }
 
-                // Sunrise and sunset
                 SunTile(
                     sunrise = weather.sunrise,
                     sunset = weather.sunset
                 )
 
-                // Wind speed, gusts and direction
                 WindTiles(
                     speedKph = weather.windKph,
                     gustKph = weather.gustKph,

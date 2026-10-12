@@ -62,7 +62,6 @@ fun TaskListView(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-
     var activeTaskToEdit by remember { mutableStateOf<Task?>(null) }
     var isSheetVisible by remember { mutableStateOf(false) }
     var isWeatherViewVisible by remember { mutableStateOf(false) }
@@ -74,33 +73,31 @@ fun TaskListView(
     val weatherType = WeatherType.from(weatherState)
     val accent = remember(weatherType) { weatherType.toAccent() }
 
-    // System back closes the weather page instead of leaving the app
     BackHandler(enabled = isWeatherViewVisible) { isWeatherViewVisible = false }
 
     val showCompleted = selectedTabIndex == 1
     val filteredTasks = tasks.filter { task ->
-        val matchesTab = task.isCompleted == showCompleted
-        val matchesSearch = searchQuery.isEmpty() ||
-                task.title.contains(searchQuery, ignoreCase = true) ||
-                task.description.contains(searchQuery, ignoreCase = true)
-        matchesTab && matchesSearch
+        task.isCompleted == showCompleted && (
+                searchQuery.isEmpty() ||
+                        task.title.contains(searchQuery, ignoreCase = true) ||
+                        task.description.contains(searchQuery, ignoreCase = true)
+                )
     }
 
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val listTopPadding = statusBarTop + SearchPillHeight + SearchBarVerticalMargin
 
+    fun openSheet(task: Task?) {
+        activeTaskToEdit = task
+        isSheetVisible = true
+    }
+
     CompositionLocalProvider(LocalWeatherAccent provides accent) {
-        // The Box lets the weather page sit on top of the Scaffold, FAB included
         Box(modifier = Modifier.fillMaxSize()) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 containerColor = MaterialTheme.colorScheme.background,
-                floatingActionButton = {
-                    AddTaskFab(onClick = {
-                        activeTaskToEdit = null
-                        isSheetVisible = true
-                    })
-                }
+                floatingActionButton = { AddTaskFab(onClick = { openSheet(null) }) }
             ) { innerPadding ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     LazyColumn(
@@ -132,9 +129,7 @@ fun TaskListView(
                                 selectedTabIndex = selectedTabIndex,
                                 onTabSelected = { selectedTabIndex = it }
                             )
-
                             Spacer(Modifier.height(10.dp))
-
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "Tasks",
@@ -142,7 +137,6 @@ fun TaskListView(
                                 fontSize = 30.sp,
                                 fontWeight = FontWeight.Medium
                             )
-
                             Spacer(Modifier.height(10.dp))
                         }
 
@@ -155,10 +149,7 @@ fun TaskListView(
                                 onToggleComplete = {
                                     viewModel.addTask(task.copy(isCompleted = !task.isCompleted))
                                 },
-                                onEdit = {
-                                    activeTaskToEdit = task
-                                    isSheetVisible = true
-                                },
+                                onEdit = { openSheet(task) },
                                 onDelete = { viewModel.deleteTask(task) }
                             )
                         }
@@ -177,38 +168,25 @@ fun TaskListView(
                                 bottom = SearchBarVerticalMargin
                             )
                     )
-                }
 
-                if (isSheetVisible) {
-                    TaskBottomSheet(
-                        taskToEdit = activeTaskToEdit,
-                        sheetState = sheetState,
-                        onDismiss = { isSheetVisible = false },
-                        onSave = { title, description ->
-                            val editing = activeTaskToEdit
-                            if (editing != null) {
+                    if (isSheetVisible) {
+                        TaskBottomSheet(
+                            taskToEdit = activeTaskToEdit,
+                            sheetState = sheetState,
+                            onDismiss = { isSheetVisible = false },
+                            onSave = { title, description ->
+                                val base = activeTaskToEdit
+                                    ?: Task(title = "", description = "", isCompleted = false)
                                 viewModel.addTask(
-                                    editing.copy(
-                                        title = title.trim(),
-                                        description = description.trim()
-                                    )
+                                    base.copy(title = title.trim(), description = description.trim())
                                 )
-                            } else {
-                                viewModel.addTask(
-                                    Task(
-                                        title = title.trim(),
-                                        description = description.trim(),
-                                        isCompleted = false
-                                    )
-                                )
+                                isSheetVisible = false
                             }
-                            isSheetVisible = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
 
-            // Weather page overlay: covers the whole screen, including behind the system bars
             weatherState?.let { weather ->
                 AnimatedVisibility(
                     visible = isWeatherViewVisible,

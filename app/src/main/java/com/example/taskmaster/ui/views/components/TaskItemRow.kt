@@ -71,7 +71,6 @@ fun TaskItemRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Completed: solid gradient fill. Not completed: gradient ring, empty inside.
                 Box(
                     modifier = Modifier
                         .size(24.dp)
@@ -101,7 +100,6 @@ fun TaskItemRow(
                 }
             }
 
-            // Action group slider
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)

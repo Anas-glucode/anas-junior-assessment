@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,12 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
 
-private fun gustNote(gustKph: Double) = when {
-    gustKph < 20 -> "Light"
-    gustKph < 40 -> "Breezy"
-    gustKph < 60 -> "Strong"
-    else -> "Very strong"
-}
 
 @Composable
 fun WindTiles(
@@ -52,7 +45,6 @@ fun WindTiles(
             title = "Gusts",
             value = gustKph.roundToInt().toString(),
             unit = "km/h",
-            note = gustNote(gustKph),
             modifier = Modifier.weight(1f).fillMaxHeight()
         )
 

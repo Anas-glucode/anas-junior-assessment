@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -55,7 +54,6 @@ fun TaskTabRow(
                     Text(
                         text = title,
                         style = if (isSelected) {
-                            // Gradient text for the selected tab
                             TextStyle(
                                 brush = accent.brush,
                                 fontSize = 16.sp,
